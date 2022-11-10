@@ -14,8 +14,16 @@ from PIL import Image
 from tensorflow import keras
 
 
-class Utils:
-    def create_seed(tf,seed=42):
+class ModelHelper:
+    seed = 42
+    
+    def __init__ (self,models_dir,labels):
+            self.name = ""
+            self.labels = labels   #Contain the array of labels
+            self.models_dir = models_dir    #The folder where load/save models
+
+    def create_seed(self,tf,seed=42):
+        self.seed = 42
         # Random seed for reproducibility
         random.seed(seed)
         os.environ['PYTHONHASHSEED'] = str(seed)
@@ -75,25 +83,13 @@ class Utils:
         ax2.grid(alpha=.3)
         plt.show()
 
-    def save_model(model,name="Model"):
-        model.save(name)
+    #Save model To memory
+    def save_model(self,model,name="Model"):
+        model.save(os.path.join(self.models_dir, name)) 
 
-    def load_model(name,relative_path=''):
-        return keras.models.load_model(relative_path+name)
-
-    def normalize_data(train,test,mode=1):
-        if mode==1:
-            # Normalize data
-            train = train/255. #pixel value
-            test = test/255. #pixel value
-        elif mode==2:
-            train = train*255. #pixel value
-            test = test*255. #pixel value
-        #elif mode==3:
-
-
-        return train,test
-
+    #Load Model from memory
+    def load_model(self,name):
+        tf.keras.models.load_model(os.path.join(self.models_dir, name))
 
     def plot_latent_filters(tfk,X_train,model, layers, image):
         fig, axes = plt.subplots(1, len(layers), figsize=(20,5))
@@ -108,6 +104,7 @@ class Utils:
         for i in range(n):
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
+    #Calculate and show the confusion matrix of the model
     def show_confusion_matrix(labels,predictions,y_test):
         # Build the confusion matrix (using scikit-learn)
         cm = confusion_matrix(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1))
