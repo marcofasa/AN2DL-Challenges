@@ -25,13 +25,14 @@ class DatasetHelper:
         X = np.array(X)
         Y = np.array(Y)
 
-        return X,Y,dataset_size
+        return X,Y
 
     #Load Dataset Without Image augmentation
     def load_Dataset(self,image_size):
         train_data_gen = ImageDataGenerator()
         training_dir = self.dataset_folder
         batch_size = 8
+        print("Extracting data from dataset at: " + training_dir)
         train_data = train_data_gen.flow_from_directory(directory=training_dir,
                                                         target_size=(96,96), #TODO change to image_size
                                                         color_mode='rgb',

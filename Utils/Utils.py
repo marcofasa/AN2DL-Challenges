@@ -16,7 +16,8 @@ from tensorflow import keras
 
 class ModelHelper:
     seed = 42
-    
+    model = None
+
     def __init__ (self,models_dir,labels):
             self.name = ""
             self.labels = labels   #Contain the array of labels
@@ -31,7 +32,7 @@ class ModelHelper:
         tf.random.set_seed(seed)
         tf.compat.v1.set_random_seed(seed)
 
-    def monitor(histories, names, colors, early_stopping=1):
+    def monitor(self,histories, names, colors, early_stopping=1):
         assert len(histories) == len(names)
         assert len(histories) == len(colors)
         plt.figure(figsize=(15,6))
@@ -44,7 +45,7 @@ class ModelHelper:
         plt.grid(alpha=.3)
         plt.show()
 
-    def plot_residuals(model, X_, y_):
+    def plot_residuals(self,model, X_, y_):
         X_['sort'] = y_
         X_ = X_.sort_values(by=['sort'])
         y_ = np.expand_dims(X_['sort'], 1)
@@ -71,27 +72,32 @@ class ModelHelper:
         plt.grid(alpha=.3)
         plt.show()
 
-    def show_prediction(X_test,Y_test,prediction_index,labels,predicted_vector):
+    def show_prediction(self,X_test,Y_test,prediction_index):
+        predictions = self.model.predict(X_test)
+
         fig, (ax1, ax2) = plt.subplots(1,2)
         fig.set_size_inches(15,5)
         ax1.imshow(X_test[prediction_index])
         #Each class has its own score
         #We select the label with the largest prediction score
-        ax1.set_title('True label: '+labels[np.argmax(Y_test[prediction_index])+1])
-        ax2.barh(list(labels.values()), predicted_vector[prediction_index], color=plt.get_cmap('Paired').colors)
-        ax2.set_title('Predicted label: '+labels[np.argmax(predicted_vector[prediction_index])])
+        ax1.set_title('True label: '+self.labels[np.argmax(Y_test[prediction_index])])
+        ax2.barh(list(self.labels.values()), predictions[prediction_index], color=plt.get_cmap('Paired').colors)
+        ax2.set_title('Predicted label: '+ self.labels[np.argmax(predictions[prediction_index])])
         ax2.grid(alpha=.3)
         plt.show()
 
     #Save model To memory
     def save_model(self,model,name="Model"):
-        model.save(os.path.join(self.models_dir, name)) 
+        model.save(os.path.join(self.models_dir, name))
+        self.model = model
 
     #Load Model from memory
     def load_model(self,name):
-        tf.keras.models.load_model(os.path.join(self.models_dir, name))
+        model = tf.keras.models.load_model(os.path.join(self.models_dir, name))
+        self.model = model
+        return model
 
-    def plot_latent_filters(tfk,X_train,model, layers, image):
+    def plot_latent_filters(self,tfk,X_train,model, layers, image):
         fig, axes = plt.subplots(1, len(layers), figsize=(20,5))
         for j,layer in enumerate(layers):
             ax = axes[j]
@@ -105,7 +111,12 @@ class ModelHelper:
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
     #Calculate and show the confusion matrix of the model
-    def show_confusion_matrix(labels,predictions,y_test):
+    def show_confusion_matrix(self,x_test,y_test):
+        if self.model == None:
+            print("No Model Loaded in this helper class, try use save_model(model,name) function")
+            return None
+        
+        predictions = self.model.predict(x_test)
         # Build the confusion matrix (using scikit-learn)
         cm = confusion_matrix(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1))
 
@@ -121,20 +132,20 @@ class ModelHelper:
 
         # Plot the confusion matrix
         plt.figure(figsize=(10,8))
-        sns.heatmap(cm.T, xticklabels=list(labels.values()), yticklabels=list(labels.values()))
+        sns.heatmap(cm.T, xticklabels=list(self.labels.values()), yticklabels=list(self.labels.values()))
         plt.xlabel('True labels')
         plt.ylabel('Predicted labels')
         plt.show()
 
-    def plot_phase_train_vs_validation(history,train_error_name='loss',val_error_name='accuracy',model=None,X_train=None,y_train=None,X_val=None, y_val=None):
+    def plot_phase_train_vs_validation(self,history,train_error_name='loss',val_error_name='accuracy',model=None,X_train=None,y_train=None,X_val=None, y_val=None):
         # Plot the training
         plt.figure(figsize=(20,5))
         plt.plot(history[train_error_name], label='Training', alpha=.8, color='#ff7f0e')
         plt.plot(history['val_'+train_error_name], label='Validation', alpha=.8, color='#4D61E2')
-        plt.legend(loc=train_error_name)
+        plt.legend(loc='upper left')
         plt.title(train_error_name)
         plt.grid(alpha=.3)
-
+        print("BABABA")
         plt.figure(figsize=(20,5))
         plt.plot(history[val_error_name], label='Training', alpha=.8, color='#ff7f0e')
         plt.plot(history['val_'+val_error_name], label='Validation', alpha=.8, color='#4D61E2')
@@ -150,7 +161,7 @@ class ModelHelper:
             print('Validation Performance')
             history.plot_residuals(model=model, X_= X_val.copy(), Y_= y_val.copy())
 
-    def inspect_data(labels,X_train_val,y_train_val):
+    def inspect_data(self,labels,X_train_val,y_train_val):
         # Inspect the data
         num_row = 2
         num_col = 5
