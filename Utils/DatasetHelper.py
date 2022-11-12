@@ -19,8 +19,8 @@ class DatasetHelper:
     #Convert ImageDataGenerator to Numpy
     def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size):
 
-        x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset_size))])
-        y=np.concatenate([dataset.next()[1] for i in tqdm(range(dataset_size))])
+        x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset.__len__()))])
+        y=np.concatenate([dataset.next()[1] for i in tqdm(range(dataset.__len__()))])
         '''
         X = [] #Training
         Y = [] #Testing
@@ -34,7 +34,7 @@ class DatasetHelper:
         X = np.array(X)
         Y = np.array(Y)
         '''
-        return X,Y
+        return x,y
 
     #Load Dataset Without Image augmentation
     def load_Dataset(self,image_size):
