@@ -5,7 +5,7 @@ import random
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+from sklearn.model_selection import train_test_split
 class DatasetHelper:
     #Path is the folder where we will have dataset,model_savings....
     def __init__(self, path,seed):
@@ -48,23 +48,6 @@ class DatasetHelper:
                                                         seed=self.seed)
         #TODO SEE HOW RETRIVE DATASET SIZE FROM TRAIN_DATA
         return self.convert_dataset_to_numpy(train_data,3452,batch_size)
-
-    #Load The dataset adding data throigh augmentation techniques
-    def load_augmented_Dataset(self,image_size,augmentation_info): #TODO ADD THE AUGMENTATION PARAMETERS TO THIS FUNCTION
-        train_data_gen = ImageDataGenerator()
-        training_dir = self.path
-        batch_size = 8
-        train_data = train_data_gen.flow_from_directory(directory=training_dir,
-                                                        target_size=(96,96), #TODO change to image_size
-                                                        color_mode='rgb',
-                                                        classes=None, # can be set to labels
-                                                        class_mode='categorical',
-                                                        batch_size=batch_size,
-                                                        shuffle=True,
-                                                        seed=self.seed)
-
-        return self.convert_dataset_to_numpy(train_data,3452,batch_size)
-
 
     '''
         Return Xtrain,X_val,X_test,Ytrain,Y_test,Y_val
@@ -109,7 +92,7 @@ class DatasetHelper:
                                     shuffle=True,
                                     sample_weight=None,
                                     seed=self.seed,
-                                    save_to_dir='./test_augmentation',
+                                    save_to_dir=None,
                                     save_format='png',
                                     ignore_class_split=False,
                                     subset=None
@@ -163,7 +146,7 @@ class DatasetHelper:
         -2) Multiply by max
         -3) TODO ADD NEW METHODS FROM SLIDE
     '''
-    def normalize_data(train,test,mode=1): #TODO PUT AN ENUMERATION FOR THE NORMALIZATION TYPE
+    def normalize_data(self,train,test,mode=1): #TODO PUT AN ENUMERATION FOR THE NORMALIZATION TYPE
 
         if mode==1:
             # Normalize data

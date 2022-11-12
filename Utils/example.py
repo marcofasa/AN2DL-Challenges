@@ -24,9 +24,9 @@ print(tf.__version__)
 
 import sys
 
-sys.path.append('../../../Utils/')
+#sys.path.append('../../../Utils/')
 from DatasetHelper import DatasetHelper
-from Utils import ModelHelper
+from ModelHelper import ModelHelper
 
 # Dataset folders 
 dataset_dir = '../../data'
@@ -38,11 +38,11 @@ seed = 42
 labels = {0:'Species1', 1:'Species2', 2:'Species3', 3:'Species4',4:'Species5', 5:'Species6', 6:'Species7', 7:'Species8'}
 
 #Dataset Helper
-dataset_helper = DatasetHelper("../../",42) #Take in input dataset folder and random seed
+dataset_helper = DatasetHelper("../Homework1/",42) #Take in input dataset folder and random seed
 
 #Model Helper
 #SAVE MODEL IN LOCAL, IF MODEL IS GOOD; COPY IT BY HAND TO good_model Folder
-model_helper   = ModelHelper("../../local_saved_models/",labels) #take in input local models folder and lables
+model_helper   = ModelHelper("../Homework1/",labels) #take in input local models folder and lables
 model_helper.create_seed(tf,seed);
 
 #Load Dataset
@@ -53,73 +53,15 @@ dataset_size = X.shape[0]
 
 print(dataset_size)
 
-dataset_helper.apply_data_augmentation(X,Y)
+#SPLIT and NORMALIZE OUR DATASET
+X_train,X_test,X_val,Y_train,Y_test,Y_val = dataset_helper.split_and_normalize(X,Y,split_test=0.1,split_val=0.1,normalization_mode = 1)
 
-'''
-# Dataset folders 
-dataset_dir = '../../data'
-training_dir = os.path.join(dataset_dir, '')
+#GENERATE 3000 new images
+X_train,Y_train = dataset_helper.apply_data_augmentation(X_train,Y_train,3000)
 
+input_shape = X_train.shape[:1] #(None,96,96,3)
 
-#Load Data Form Folder
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-seed = 42
-batch_size = 8
-train_data_gen = ImageDataGenerator()
-
-train_data = train_data_gen.flow_from_directory(directory=training_dir,
-                                               target_size=(96,96),
-                                               color_mode='rgb',
-                                               classes=None, # can be set to labels
-                                               class_mode='categorical',
-                                               batch_size=batch_size,
-                                               shuffle=True,
-                                               seed=seed)
-
-
-images, labels = next(train_data)
-#https://towardsdatascience.com/introduction-to-keras-part-one-data-loading-43b9c015e27c
-plt.figure(figsize=(10, 10))
-for i in range(8):
-    ax = plt.subplot(3, 3, i + 1)
-    plt.imshow((images[i]).astype(np.uint8))
-    index = [index for index, each_item in enumerate(labels[i]) if each_item]
-    plt.title(list(train_data.class_indices.keys())[index[0]])
-    plt.axis("off")
-
-
-#Now Go through all the batches and add them to the dataset
-from tqdm import tqdm
-X = [] #Training
-Y = [] #Testing
-dataset_size = 3542
-for j in tqdm(range(0,int(dataset_size/batch_size))):
-  images,labels = next(train_data)
-  for i in range(images.shape[0]):
-    X.append(images[i])
-    Y.append(labels[i])
-
-X = np.array(X)
-Y = np.array(Y)
-
-X.shape,Y.shape
-
-#Split Training and Testing
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=seed, test_size=int(0.1 * dataset_size),stratify = Y)
-
-# Normalize data
-X_train = X_train/255.
-X_test = X_test/255.
-
-#Split Training and Validation
-X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, random_state=seed, test_size=int(0.1 * dataset_size),stratify = Y_train)
-
-input_shape = X_train.shape[1:] # 96*96*3
-batch_size = 128
-epochs = 100
-input_shape
-
-
+#Create the Model
 def build_model(input_shape):
     tf.random.set_seed(seed)
 
@@ -179,21 +121,42 @@ def build_model(input_shape):
 
     # Return the model
     return model
-    
-    
+
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  #For nicola, avoid GPU 
+
+#Build the model
+input_shape = X_train.shape[1:] # 96*96*3
+batch_size = 128
+epochs = 1
+
 model = build_model(input_shape)
 model.summary()
-visualkeras.layered_view(model, legend=True, spacing=20, scale_xy=1)
+
+#Train the model
 
 
 # Train the model
+
+#Create ALL desired callbacks
+callbacks_selected = model_helper.createCallbacks(earlyStopping = True)
+
+#Fit the model
 history = model.fit(
     x = X_train,
     y = Y_train,
     batch_size = batch_size,
     epochs = epochs,
-    validation_data = (X_val, Y_val)
+    validation_data = (X_val, Y_val),
+    callbacks = callbacks_selected
 ).history
 
-model.save('test')
-'''
+model_helper.save_model(model,"ExampleModel")
+
+model = model_helper.load_model("ExampleModel")
+
+model.summary()
+
+model_helper.show_confusion_matrix(X_test,Y_test)
+model_helper.plot_phase_train_vs_validation(history)
+#Print THE Confusion matrix
