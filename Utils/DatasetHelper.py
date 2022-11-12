@@ -66,8 +66,27 @@ class DatasetHelper:
         return self.convert_dataset_to_numpy(train_data,3452,batch_size)
 
 
+    '''
+        Return Xtrain,X_val,X_test,Ytrain,Y_test,Y_val
+
+        specify the split for test and validation and specify the normalization mode 
+        (see self.normalize_data for the modality available)
+    '''
+    def split_and_normalize(self,X,Y,split_test = .1 ,split_val =.1,normalization_mode=1):
+        #Split Training and Testing
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=self.seed, test_size=int(split_test * X.shape[0]),stratify = Y)
+
+        # Normalize data
+        X_train,X_test = self.normalize_data(X_train,X_test,1)
+
+        #Split Training and Validation
+        X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, random_state=self.seed, test_size=int(split_val * X_train.shape[0]),stratify = Y_train)
+
+
+        return X_train,X_test,X_val,Y_train,Y_test,Y_val
+
     #TODO ADD SOME PARAMETERS TO CHANGE
-    def apply_data_augmentation(self,X,Y):
+    def apply_data_augmentation(self,X,Y,num_of_images):
         X_new = []
         Y_new = []
         #TODO PARAMETRIZE THIS PART
@@ -81,7 +100,7 @@ class DatasetHelper:
         
         i=0
         batch_size = 32
-        stop_condition =  int(1000 / batch_size)
+        stop_condition =  int(num_of_images / batch_size)
         print("STOP CONDITION; " + str(stop_condition))
 
         generator = data_generator.flow(
@@ -154,4 +173,5 @@ class DatasetHelper:
             test = test*255. #pixel value
         #elif mode==3:
 
+        #TODO image mean normalization, image deviation normalization etc... see slide
         return train,test
