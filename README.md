@@ -13,6 +13,14 @@ https://github.com/manuelsalamino/ANNDL_Competition \
 https://github.com/giovannidispoto/AN2DL-homeworks 
 
 
+### Model Slots:
+
+- 1-> DEFAULT
+- 2->
+- 3-> MARCO
+- 4->
+- 5->
+
 ### IDEE:
 
 
