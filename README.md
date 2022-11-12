@@ -22,7 +22,13 @@ https://github.com/giovannidispoto/AN2DL-homeworks
 - 5->
 
 ### IDEE:
-
+- test augmentations
+- applicare Shuffling
+- applicare batch normalization
+- modificare receptive field e dimensione dei filtri
+- aggiungere più convolutions
+- applicare skipping
+- cambiare learning rate
 
 ### IDEE GIA PROVATE:
 
