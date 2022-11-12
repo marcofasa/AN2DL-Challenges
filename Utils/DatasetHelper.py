@@ -76,7 +76,7 @@ class DatasetHelper:
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
     def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1):
         X = self.denormalize(X,norm_mode) #Denormalize
-        print("AA")
+        print("BB")
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
             rotation_range = 15,
@@ -104,15 +104,19 @@ class DatasetHelper:
                                 )
 
         print(X.shape)
+        generator.reset()
+        for i in tqdm(range(stop_condition)):
+            imgages,targets = generator.next()
+            X=np.concatenate((X,imgages), axis=0)
+            Y=np.concatenate((Y,targets), axis=0)
 
-        x=np.concatenate([generator.next()[0] for i in tqdm(range(stop_condition))])
-        y=np.concatenate([generator.next()[1] for i in tqdm(range(stop_condition))])
 
-        print(x.shape)
-        print(y.shape)
+        #x=np.concatenate([generator.next()[0] for i in tqdm(range(stop_condition))])
+        #y=np.concatenate([generator.next()[1] for i in tqdm(range(stop_condition))])
 
-        X = np.concatenate((X, x), axis=0)
-        Y = np.concatenate((Y, y), axis=0)
+
+        #X = np.concatenate((X, x), axis=0)
+        #Y = np.concatenate((Y, y), axis=0)
 
         print(X.shape)
         print(Y.shape)
