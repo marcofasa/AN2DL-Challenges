@@ -183,7 +183,7 @@ class ModelHelper:
 
         print('Counting occurrences of target classes:')
         print(pd.DataFrame(y_train_val, columns=['digit'])['digit'].value_counts())
-
+    
     '''
     Create the callbacks function, select the desired functions by setting its parameter to 1
     1) checkPoint    -> Save model checkpoint each epoch
