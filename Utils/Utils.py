@@ -18,10 +18,13 @@ class ModelHelper:
     seed = 42
     model = None
 
-    def __init__ (self,models_dir,labels):
+    def __init__ (self,path,labels):
             self.name = ""
             self.labels = labels   #Contain the array of labels
-            self.models_dir = models_dir    #The folder where load/save models
+            self.local_checkpoints = os.path.join(self.path, 'local_checkpoints')
+            self.local_tensorboard = os.path.join(self.path, 'local_tensorboard')
+            #The folder where load/save models
+            self.models_dir = os.path.join(self.path, 'local_saved_models')
 
     def create_seed(self,tf,seed=42):
         self.seed = 42
@@ -180,3 +183,38 @@ class ModelHelper:
 
         print('Counting occurrences of target classes:')
         print(pd.DataFrame(y_train_val, columns=['digit'])['digit'].value_counts())
+
+    '''
+    Create the callbacks function, select the desired functions by setting its parameter to 1
+    1) checkPoint    -> Save model checkpoint each epoch
+    2) earlyStopping -> If model is stuck with no improvement for more then [patience] restore best weights
+    3) tensorboard   -> Save all training info for tensorboard visualization
+
+    eg: callbacks = createCallbacks(checkPoint = True, save_weights_only = False,earlyStopping = True)
+        history= model.fit(...., callbacks = callbacks)
+    '''
+    def createCallbacks(self,checkPoints = False, earlyStopping = False, tensorboard = False,patience = 10,save_weights_only = True,save_best_only=False):
+        callbacks = []
+        
+        #MODEL CHECKPOINTING AT EACH EPOCH
+        if checkPoints:
+            ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(self.local_checkpoints, 'cp.ckpt'), 
+                                                     save_weights_only=save_weights_only, # True to save only weights
+                                                     save_best_only=save_best_only) # True to save only the best epoch
+            callbacks.append(ckpt_callback)
+
+        #SAVE TRAINING INFO FOR TENSORBOARD
+        if tensorboard:
+            # By default shows losses and metrics for both training and validation
+            tb_callback = tf.keras.callbacks.TensorBoard(log_dir=self.local_tensorboard, 
+                                                        profile_batch=0,
+                                                        histogram_freq=1)  # if > 0 (epochs) shows weights histograms
+            callbacks.append(tb_callback)
+        #EARLY STOPPING IF OVERFITTING
+        if earlyStopping:
+            # Early Stopping
+            # --------------
+            es_callback = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=patience, restore_best_weights=True)
+            callbacks.append(es_callback)
+
+        return callbacks

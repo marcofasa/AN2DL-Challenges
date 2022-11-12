@@ -22,7 +22,40 @@ tfk = tf.keras
 tfkl = tf.keras.layers
 print(tf.__version__)
 
+import sys
 
+sys.path.append('../../../Utils/')
+from DatasetHelper import DatasetHelper
+from Utils import ModelHelper
+
+# Dataset folders 
+dataset_dir = '../../data'
+training_dir = os.path.join(dataset_dir, '')
+
+
+#Create Instances Of Utils Helper
+seed = 42
+labels = {0:'Species1', 1:'Species2', 2:'Species3', 3:'Species4',4:'Species5', 5:'Species6', 6:'Species7', 7:'Species8'}
+
+#Dataset Helper
+dataset_helper = DatasetHelper("../../",42) #Take in input dataset folder and random seed
+
+#Model Helper
+#SAVE MODEL IN LOCAL, IF MODEL IS GOOD; COPY IT BY HAND TO good_model Folder
+model_helper   = ModelHelper("../../local_saved_models/",labels) #take in input local models folder and lables
+model_helper.create_seed(tf,seed);
+
+#Load Dataset
+X,Y = dataset_helper.load_dataset_from_numpy()
+#X,Y = dataset_helper.load_Dataset(22)
+
+dataset_size = X.shape[0]
+
+print(dataset_size)
+
+dataset_helper.apply_data_augmentation(X,Y)
+
+'''
 # Dataset folders 
 dataset_dir = '../../data'
 training_dir = os.path.join(dataset_dir, '')
@@ -163,3 +196,4 @@ history = model.fit(
 ).history
 
 model.save('test')
+'''

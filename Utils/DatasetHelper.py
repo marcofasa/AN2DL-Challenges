@@ -65,8 +65,11 @@ class DatasetHelper:
 
         return self.convert_dataset_to_numpy(train_data,3452,batch_size)
 
+
     #TODO ADD SOME PARAMETERS TO CHANGE
     def apply_data_augmentation(self,X,Y):
+        X_new = []
+        Y_new = []
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
             rotation_range = 40,
@@ -77,10 +80,14 @@ class DatasetHelper:
             )
         
         i=0
-        for batch in data_generator.flow(
+        batch_size = 32
+        stop_condition =  int(1000 / batch_size)
+        print("STOP CONDITION; " + str(stop_condition))
+
+        generator = data_generator.flow(
                                     X,
                                     Y,
-                                    batch_size=8,
+                                    batch_size=32,
                                     shuffle=True,
                                     sample_weight=None,
                                     seed=self.seed,
@@ -88,10 +95,22 @@ class DatasetHelper:
                                     save_format='png',
                                     ignore_class_split=False,
                                     subset=None
-                                ):
-            i += 1
-            if i > 20: # save 20 images
-                break  # otherwise the generator would loop indefinitely
+                                )
+
+        print(X.shape)
+
+        x=np.concatenate([generator.next()[0] for i in tqdm(range(stop_condition))])
+        y=np.concatenate([generator.next()[1] for i in tqdm(range(stop_condition))])
+
+        print(x.shape)
+        print(y.shape)
+
+        X = np.concatenate((X, x), axis=0)
+        Y = np.concatenate((Y, y), axis=0)
+
+        print(X.shape)
+        print(Y.shape)
+        
 
     #Allow to save all images directly in numpy format, no need to load them 1 by one (fasten up the data augmentation problem)
     #TODO COMPLETE THIS FUNCTION (load function dosnt work properly)
@@ -116,40 +135,7 @@ class DatasetHelper:
                 #Return dataset
                 return X,Y
 
-    '''
-    Create the callbacks function, select the desired functions by setting its parameter to 1
-    1) checkPoint    -> Save model checkpoint each epoch
-    2) earlyStopping -> If model is stuck with no improvement for more then [patience] restore best weights
-    3) tensorboard   -> Save all training info for tensorboard visualization
 
-    eg: callbacks = createCallbacks(checkPoint = True, save_weights_only = False,earlyStopping = True)
-        history= model.fit(...., callbacks = callbacks)
-    '''
-    def createCallbacks(self,checkPoints = False, earlyStopping = False, tensorboard = False,patience = 10,save_weights_only = True,save_best_only=False):
-        callbacks = []
-        
-        #MODEL CHECKPOINTING AT EACH EPOCH
-        if checkPoints:
-            ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(self.local_checkpoints, 'cp.ckpt'), 
-                                                     save_weights_only=save_weights_only, # True to save only weights
-                                                     save_best_only=save_best_only) # True to save only the best epoch
-            callbacks.append(ckpt_callback)
-
-        #SAVE TRAINING INFO FOR TENSORBOARD
-        if tensorboard:
-            # By default shows losses and metrics for both training and validation
-            tb_callback = tf.keras.callbacks.TensorBoard(log_dir=self.local_tensorboard, 
-                                                        profile_batch=0,
-                                                        histogram_freq=1)  # if > 0 (epochs) shows weights histograms
-            callbacks.append(tb_callback)
-        #EARLY STOPPING IF OVERFITTING
-        if earlyStopping:
-            # Early Stopping
-            # --------------
-            es_callback = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=patience, restore_best_weights=True)
-            callbacks.append(es_callback)
-
-        return callbacks
     '''
         Normalize Dataset Data
         MODES:

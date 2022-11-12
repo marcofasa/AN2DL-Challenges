@@ -2,3 +2,7 @@
 *.iml
 /.idea
 Homework1/local_saved_models/* 
+Homework1/local_checkpoints/* 
+Homework1/local_tensorboard/*
+Homework1/data_numpy_format/*
+.vscode
