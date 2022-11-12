@@ -18,6 +18,10 @@ class DatasetHelper:
 
     #Convert ImageDataGenerator to Numpy
     def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size):
+
+        x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset_size))])
+        y=np.concatenate([dataset.next()[1] for i in tqdm(range(dataset_size))])
+        '''
         X = [] #Training
         Y = [] #Testing
         dataset_size = 3542
@@ -29,7 +33,7 @@ class DatasetHelper:
 
         X = np.array(X)
         Y = np.array(Y)
-
+        '''
         return X,Y
 
     #Load Dataset Without Image augmentation
@@ -70,13 +74,14 @@ class DatasetHelper:
 
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
-    def apply_data_augmentation(self,X,Y,num_of_images):
+    def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1):
+        X = self.denormalize(X,norm_mode) #Denormalize
+        print("AA")
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
-            rotation_range = 40,
+            rotation_range = 15,
             shear_range = 0.2,
-            zoom_range = 0.2,
-            horizontal_flip = True,
+            zoom_range = 0.3,
             brightness_range = (0.5, 1.5)
             )
         
@@ -112,6 +117,7 @@ class DatasetHelper:
         print(X.shape)
         print(Y.shape)
         
+        X = self.normalize(X,norm_mode)
         return X,Y
         
 
@@ -148,14 +154,28 @@ class DatasetHelper:
     '''
     def normalize_data(self,train,test,mode=1): #TODO PUT AN ENUMERATION FOR THE NORMALIZATION TYPE
 
-        if mode==1:
-            # Normalize data
-            train = train/255. #pixel value
-            test = test/255. #pixel value
-        elif mode==2:
-            train = train*255. #pixel value
-            test = test*255. #pixel value
-        #elif mode==3:
+        train = self.normalize(train,mode)
+        test  = self.normalize(test,mode)
 
         #TODO image mean normalization, image deviation normalization etc... see slide
         return train,test
+
+    def denormalize(self,X,mode=1):
+        if mode==1:
+            # Normalize data
+            X = X*255. #pixel value
+        elif mode==2:
+            X = X/255
+        #elif mode==3:
+
+        return X
+
+    def normalize(self,X,mode=1):
+        if mode==1:
+            # Normalize data
+            X = X/255. #pixel value
+        elif mode==2:
+            X = X*255
+        #elif mode==3:
+
+        return X

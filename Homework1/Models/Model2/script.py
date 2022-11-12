@@ -24,7 +24,7 @@ print(tf.__version__)
 
 import sys
 
-#sys.path.append('../../../Utils/')
+sys.path.append('../../../Utils/')
 from DatasetHelper import DatasetHelper
 from ModelHelper import ModelHelper
 
@@ -33,11 +33,11 @@ seed = 42
 labels = {0:'Species1', 1:'Species2', 2:'Species3', 3:'Species4',4:'Species5', 5:'Species6', 6:'Species7', 7:'Species8'}
 
 #Dataset Helper
-dataset_helper = DatasetHelper("../Homework1/",42) #Take in input dataset folder and random seed
+dataset_helper = DatasetHelper("../../",42) #Take in input dataset folder and random seed
 
 #Model Helper
 #SAVE MODEL IN LOCAL, IF MODEL IS GOOD; COPY IT BY HAND TO good_model Folder
-model_helper   = ModelHelper("../Homework1/",labels) #take in input local models folder and lables
+model_helper   = ModelHelper("../../",labels) #take in input local models folder and lables
 model_helper.create_seed(tf,seed);
 
 #Load Dataset
@@ -45,8 +45,7 @@ X,Y = dataset_helper.load_dataset_from_numpy()
 #X,Y = dataset_helper.load_Dataset(22)
 
 dataset_size = X.shape[0]
-
-print(dataset_size)
+print("Dataset Size" + str(dataset_size))
 
 #SPLIT and NORMALIZE OUR DATASET
 X_train,X_test,X_val,Y_train,Y_test,Y_val = dataset_helper.split_and_normalize(X,Y,split_test=0.1,split_val=0.1,normalization_mode = 1)
@@ -121,7 +120,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  #For nicola, avoid GPU
 #Build the model
 input_shape = X_train.shape[1:]#(None,96,96,3)
 batch_size = 128
-epochs = 1
+epochs = 2
 
 model = build_model(input_shape)
 model.summary()
@@ -132,7 +131,7 @@ model.summary()
 # Train the model
 
 #Create ALL desired callbacks
-callbacks_selected = model_helper.createCallbacks(earlyStopping = True)
+callbacks_selected = model_helper.createCallbacks(earlyStopping = True,checkPoints=True)
 
 #Fit the model
 history = model.fit(
