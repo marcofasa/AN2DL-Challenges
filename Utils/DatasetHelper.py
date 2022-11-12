@@ -85,10 +85,9 @@ class DatasetHelper:
 
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
-    #TODO ADD SOME PARAMETERS TO CHANGE
+    #Generate a new X,Y with augmented data of "num_of_images"
+    #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
     def apply_data_augmentation(self,X,Y,num_of_images):
-        X_new = []
-        Y_new = []
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
             rotation_range = 40,
@@ -129,6 +128,8 @@ class DatasetHelper:
 
         print(X.shape)
         print(Y.shape)
+        
+        return X,Y
         
 
     #Allow to save all images directly in numpy format, no need to load them 1 by one (fasten up the data augmentation problem)
