@@ -54,6 +54,7 @@ X_train,X_test,X_val,Y_train,Y_test,Y_val = dataset_helper.split_and_normalize(X
 #GENERATE 3000 new images
 X_train,Y_train = dataset_helper.apply_data_augmentation(X_train,Y_train,3000)
 
+exit()
 #Create the Model
 def build_model(input_shape):
     tf.random.set_seed(seed)

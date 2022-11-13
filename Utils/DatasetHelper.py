@@ -17,10 +17,16 @@ class DatasetHelper:
         self.seed = seed
 
     #Convert ImageDataGenerator to Numpy
-    def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size):
+    def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size): 
+        dataset.reset()
+        X,Y = dataset.next() #Initialize X and Y with first images
+        #x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset.__len__()))])
+        #y=np.concatenate([dataset.next()[1] for i in tqdm(range(dataset.__len__()))])
 
-        x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset.__len__()))])
-        y=np.concatenate([dataset.next()[1] for i in tqdm(range(dataset.__len__()))])
+        for i in tqdm(range(dataset_size-1)):
+            imgages,targets = dataset.next()
+            X=np.concatenate((X,imgages), axis=0)
+            Y=np.concatenate((Y,targets), axis=0)
         '''
         X = [] #Training
         Y = [] #Testing
@@ -34,7 +40,7 @@ class DatasetHelper:
         X = np.array(X)
         Y = np.array(Y)
         '''
-        return x,y
+        return X,Y
 
     #Load Dataset Without Image augmentation
     def load_Dataset(self,image_size):
@@ -51,7 +57,7 @@ class DatasetHelper:
                                                         shuffle=True,
                                                         seed=self.seed)
         #TODO SEE HOW RETRIVE DATASET SIZE FROM TRAIN_DATA
-        return self.convert_dataset_to_numpy(train_data,3452,batch_size)
+        return self.convert_dataset_to_numpy(train_data,train_data.__len__(),batch_size)
 
     '''
         Return Xtrain,X_val,X_test,Ytrain,Y_test,Y_val
@@ -80,9 +86,11 @@ class DatasetHelper:
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
             rotation_range = 15,
-            shear_range = 0.2,
+            width_shift_range = 0.1,
+            height_shift_range = 0.1,
             zoom_range = 0.3,
-            brightness_range = (0.5, 1.5)
+            fill_mode = 'reflect',  #So that the fill is not strange
+            brightness_range = (0.5, 1.1)
             )
         
         i=0
@@ -105,8 +113,11 @@ class DatasetHelper:
 
         print(X.shape)
         generator.reset()
+
         for i in tqdm(range(stop_condition)):
             imgages,targets = generator.next()
+            #print(np.unique(targets,axis=0, return_counts=True))
+            #break
             X=np.concatenate((X,imgages), axis=0)
             Y=np.concatenate((Y,targets), axis=0)
 
@@ -120,7 +131,12 @@ class DatasetHelper:
 
         print(X.shape)
         print(Y.shape)
-        
+
+        #Shuffle array
+        p = np.random.permutation(X.shape[0])
+        X = X[p]
+        Y = Y[p]
+
         X = self.normalize(X,norm_mode)
         return X,Y
         

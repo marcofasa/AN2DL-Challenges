@@ -152,3 +152,7 @@ model.summary()
 model_helper.show_confusion_matrix(X_test,Y_test)
 model_helper.plot_phase_train_vs_validation(history)
 #Print THE Confusion matrix
+
+
+
+#with tf.device('/CPU:0'): -> PER USARE CPU!!
