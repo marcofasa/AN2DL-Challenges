@@ -9,16 +9,27 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 class DatasetHelper:
     #Path is the folder where we will have dataset,model_savings....
-    def __init__(self, path,seed):
+    def __init__(self, path,seed, create_dirs = False):
         self.path = path
         self.dataset_folder = os.path.join(self.path, 'data')
         self.numpy_dataset  = os.path.join(self.path, 'data_numpy_format')
         self.local_checkpoints = os.path.join(self.path, 'local_checkpoints')
         self.local_tensorboard = os.path.join(self.path, 'local_tensorboard')
+
+        if create_dirs:
+            if not os.path.exists(self.dataset_folder):
+                os.makedirs(self.dataset_folder)
+            if not os.path.exists(self.numpy_dataset):
+                os.makedirs(self.numpy_dataset)
+            if not os.path.exists(self.local_checkpoints):
+                os.makedirs(self.local_checkpoints)
+            if not os.path.exists(self.local_tensorboard):
+                os.makedirs(self.local_tensorboard)
+
         self.seed = seed
 
     #Convert ImageDataGenerator to Numpy
-    def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size): 
+    def convert_dataset_to_numpy(self,dataset,dataset_size,batch_size):
         dataset.reset()
         X,Y = dataset.next() #Initialize X and Y with first images
         #x=np.concatenate([dataset.next()[0] for i in tqdm(range(dataset.__len__()))])
@@ -79,15 +90,19 @@ class DatasetHelper:
 
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
-    #Plot Distribution Of data in the dataset
-    def plot_samples_distribution(self,Y):
-        classes,classes_distribution = np.unique(Y,axis=0, return_counts=True)
+
+    def get_samples_distributions(self, Y):
+        classes, classes_distribution = np.unique(Y, axis=0, return_counts=True)
         classes = classes.argmax(1)
         classes = classes + 1
         print(classes)
 
-        y_pos = np.arange(len(classes))
+        return classes_distribution, classes_distribution
 
+    #Plot Distribution Of data in the dataset
+    def plot_samples_distribution(self,Y):
+        classes,classes_distribution = self.get_samples_distributions(Y)
+        y_pos = np.arange(len(classes))
         plt.bar(y_pos, classes_distribution, align='center', alpha=0.5)
         plt.xticks(y_pos, classes)
         plt.ylabel('Num of Samples')
@@ -103,7 +118,7 @@ class DatasetHelper:
         classes_index = classes_index[:,0]
 
         return X[classes_index],Y[classes_index]
-    
+
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
     def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1):
@@ -118,7 +133,7 @@ class DatasetHelper:
             fill_mode = 'reflect',  #So that the fill is not strange
             brightness_range = (0.5, 1.1)
             )
-        
+
         i=0
         batch_size = 32
         stop_condition =  int(num_of_images / batch_size)
@@ -148,6 +163,18 @@ class DatasetHelper:
 
         X = self.normalize(X,norm_mode)
         return X,Y
+
+    def to_sum_1(self, array: np.ndarray):
+        partial = array / np.min(array[np.nonzero(array)])
+        return partial / partial.sum()
+
+    def apply_data_augmentation_normalized(self, X, Y, num_of_images):
+        classes, classes_distributions = self.get_samples_distributions(Y)
+        classes_distributions = self.to_sum_1(num_of_images-classes_distributions)
+        return self.apply_data_augmentation_with_classes_distribution(X, Y, num_of_images,
+                                                                      class_distribution = classes_distributions)
+
+
     #Get num_of_images augmented data respecting the desired class distribution
     def apply_data_augmentation_with_classes_distribution(self,X,Y,num_of_images,class_distribution = [0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2],norm_mode=1):
        #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
@@ -193,7 +220,7 @@ class DatasetHelper:
             else:
                 #Load dataset using ImageDataGenerator
                 X,Y = self.load_Dataset(10)
-                
+
                 #Save Numpy arrays to file
                 np.save(os.path.join(self.numpy_dataset, 'images'), X)
                 np.save(os.path.join(self.numpy_dataset, 'targets'),Y)
