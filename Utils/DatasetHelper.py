@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
+from matplotlib import pyplot as plt
 class DatasetHelper:
     #Path is the folder where we will have dataset,model_savings....
     def __init__(self, path,seed):
@@ -78,11 +79,36 @@ class DatasetHelper:
 
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
+    #Plot Distribution Of data in the dataset
+    def plot_samples_distribution(self,Y):
+        classes,classes_distribution = np.unique(Y,axis=0, return_counts=True)
+        classes = classes.argmax(1)
+        classes = classes + 1
+        print(classes)
+
+        y_pos = np.arange(len(classes))
+
+        plt.bar(y_pos, classes_distribution, align='center', alpha=0.5)
+        plt.xticks(y_pos, classes)
+        plt.ylabel('Num of Samples')
+        plt.title('Dataset Classes Distribution')
+
+        plt.show()
+        return
+
+    #Return A slice of X,Y with only element of class_to_get {eg all element of specie 1}
+    def get_slice_of_class(self,X,Y,class_to_get):
+        classes = np.argwhere(Y == 1) + 1
+        classes_index = np.argwhere(classes == class_to_get)
+        classes_index = classes_index[:,0]
+
+        return X[classes_index],Y[classes_index]
+    
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
     def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1):
-        X = self.denormalize(X,norm_mode) #Denormalize
         print("BB")
+        X = self.denormalize(X,norm_mode) #Denormalize
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
             rotation_range = 15,
@@ -96,7 +122,7 @@ class DatasetHelper:
         i=0
         batch_size = 32
         stop_condition =  int(num_of_images / batch_size)
-        print("STOP CONDITION; " + str(stop_condition))
+        print("Generating " + str(num_of_images) + "Images")
 
         generator = data_generator.flow(
                                     X,
@@ -108,10 +134,9 @@ class DatasetHelper:
                                     save_to_dir=None,
                                     save_format='png',
                                     ignore_class_split=False,
-                                    subset=None
+                                    subset=None,
                                 )
 
-        print(X.shape)
         generator.reset()
 
         for i in tqdm(range(stop_condition)):
@@ -121,25 +146,36 @@ class DatasetHelper:
             X=np.concatenate((X,imgages), axis=0)
             Y=np.concatenate((Y,targets), axis=0)
 
-
-        #x=np.concatenate([generator.next()[0] for i in tqdm(range(stop_condition))])
-        #y=np.concatenate([generator.next()[1] for i in tqdm(range(stop_condition))])
-
-
-        #X = np.concatenate((X, x), axis=0)
-        #Y = np.concatenate((Y, y), axis=0)
-
-        print(X.shape)
-        print(Y.shape)
-
-        #Shuffle array
-        p = np.random.permutation(X.shape[0])
-        X = X[p]
-        Y = Y[p]
-
         X = self.normalize(X,norm_mode)
         return X,Y
-        
+    #Get num_of_images augmented data respecting the desired class distribution
+    def apply_data_augmentation_with_classes_distribution(self,X,Y,num_of_images,class_distribution = [0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2],norm_mode=1):
+       #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
+       # X = self.denormalize(X,norm_mode) #Denormalize #TODO CHECK CLEANER WAY!!
+
+        print("Data Augmentation with data distribution")
+        out_x = np.empty((0,96,96,3))
+        out_y = np.empty((0,8))
+
+        print("Data distribution = " + str(class_distribution))
+        for i in tqdm(range(Y.shape[1])):
+            print("Class: " + str(i+1))
+            #Get all element of slice i
+            curr_x,curr_y = self.get_slice_of_class(X,Y,i+1)
+            print("Class Size : " + str(curr_x.shape[0]))
+            #Apply Augmentation
+            curr_x,curr_y = self.apply_data_augmentation(curr_x,curr_y,num_of_images*class_distribution[i])
+            #Concatenate result of class i
+            out_x=np.concatenate((out_x,curr_x), axis=0)
+            out_y=np.concatenate((out_y,curr_y), axis=0)
+
+        #out_x = self.normalize(out_x,norm_mode)
+
+        #Shuffle array
+        p = np.random.permutation(out_x.shape[0])
+        out_x = out_x[p]
+        out_y = out_y[p]
+        return out_x,out_y
 
     #Allow to save all images directly in numpy format, no need to load them 1 by one (fasten up the data augmentation problem)
     #TODO COMPLETE THIS FUNCTION (load function dosnt work properly)
