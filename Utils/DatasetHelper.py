@@ -7,9 +7,11 @@ from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
+
+
 class DatasetHelper:
-    #Path is the folder where we will have dataset,model_savings....
-    def __init__(self, path,seed, create_dirs = False):
+    # Path is the folder where we will have dataset, model_savings....
+    def __init__(self, path, seed, create_dirs=False):
         self.path = path
         self.dataset_folder = os.path.join(self.path, 'data')
         self.numpy_dataset  = os.path.join(self.path, 'data_numpy_format')
@@ -226,7 +228,7 @@ class DatasetHelper:
                 return X,Y
             else:
                 #Load dataset using ImageDataGenerator
-                X,Y = self.load_Dataset(10)
+                X, Y = self.load_Dataset(10)
 
                 #Save Numpy arrays to file
                 np.save(os.path.join(self.numpy_dataset, 'images'), X)

@@ -12,20 +12,30 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from tensorflow import keras
+from datetime import datetime
 
 
 class ModelHelper:
     seed = 42
     model = None
 
-    def __init__ (self,path,labels):
-            self.name = ""
-            self.path = path
-            self.labels = labels   #Contain the array of labels
-            self.local_checkpoints = os.path.join(self.path, 'local_checkpoints')
-            self.local_tensorboard = os.path.join(self.path, 'local_tensorboard')
-            #The folder where load/save models
-            self.models_dir = os.path.join(self.path, 'local_saved_models')
+    def __init__ (self, path, labels, create_dirs=False):
+        self.name = ""
+        self.path = path
+        self.labels = labels   #Contain the array of labels
+        self.local_checkpoints = os.path.join(self.path, 'local_checkpoints')
+        self.local_tensorboard = os.path.join(self.path, 'local_tensorboard')
+        #The folder where load/save models
+        self.models_dir = os.path.join(self.path, 'local_saved_models')
+
+        if create_dirs:
+            if not os.path.exists(self.models_dir):
+                os.makedirs(self.models_dir)
+            if not os.path.exists(self.local_checkpoints):
+                os.makedirs(self.local_checkpoints)
+            if not os.path.exists(self.local_tensorboard):
+                os.makedirs(self.local_tensorboard)
+
 
     def create_seed(self,tf,seed=42):
         self.seed = 42
@@ -212,12 +222,42 @@ class ModelHelper:
     eg: callbacks = createCallbacks(checkPoint = True, save_weights_only = False,earlyStopping = True)
         history= model.fit(...., callbacks = callbacks)
     '''
-    def createCallbacks(self,checkPoints = False, earlyStopping = False, tensorboard = False,patience = 10,save_weights_only = True,save_best_only=False):
+
+
+    
+    def createCallbacks(self, where_to_save=None, model_name=None, checkPoints=False, earlyStopping=False, tensorboard=False, patience=10, save_weights_only=True, save_best_only=False):
+        """!
+            Does something ...
+
+            @param where_to_save String: path specify where to save the checkpoints (e.g., "gdrive/MyDrive/--")
+            @param model_name: name of the built model
+        """
+        
         callbacks = []
         
         #MODEL CHECKPOINTING AT EACH EPOCH
         if checkPoints:
-            ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(self.local_checkpoints, 'cp.ckpt'), 
+            # Specify where to save the checkpoints && new save format (model name + time of generation)
+            if where_to_save is not None:
+                exps_dir = os.path.join(where_to_save)
+                if not os.path.exists(exps_dir):
+                    os.makedirs(exps_dir)
+
+                now = datetime.now().strftime('%b%d_%H-%M-%S')
+
+                exp_dir = os.path.join(exps_dir, model_name + '_' + str(now))
+                if not os.path.exists(exp_dir):
+                    os.makedirs(exp_dir)
+
+                ckpt_dir = os.path.join(exp_dir, 'ckpts')
+                if not os.path.exists(ckpt_dir):
+                    os.makedirs(ckpt_dir)
+
+                ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(ckpt_dir, 'cp.ckpt'), 
+                                                     save_weights_only=save_weights_only, # True to save only weights
+                                                     save_best_only=save_best_only) # True to save only the best epoch
+            else:   # "where_to_save" NOT specified
+                ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(self.local_checkpoints, 'cp.ckpt'), 
                                                      save_weights_only=save_weights_only, # True to save only weights
                                                      save_best_only=save_best_only) # True to save only the best epoch
             callbacks.append(ckpt_callback)
