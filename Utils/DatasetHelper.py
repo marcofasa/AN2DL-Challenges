@@ -94,9 +94,6 @@ class DatasetHelper:
     def get_samples_distributions(self, Y):
         classes, classes_distribution = np.unique(Y, axis=0, return_counts=True)
         classes = classes.argmax(1)
-        classes = classes + 1
-        print(classes)
-
         return classes_distribution, classes_distribution
 
     #Plot Distribution Of data in the dataset
@@ -121,8 +118,8 @@ class DatasetHelper:
 
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
-    def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1):
-        print("BB")
+    def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1, disable_tqdm = False):
+        # print("BB")
         X = self.denormalize(X,norm_mode) #Denormalize
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
@@ -137,7 +134,7 @@ class DatasetHelper:
         i=0
         batch_size = 32
         stop_condition =  int(num_of_images / batch_size)
-        print("Generating " + str(num_of_images) + "Images")
+        # print("Generating " + str(num_of_images) + "Images")
 
         generator = data_generator.flow(
                                     X,
@@ -154,12 +151,15 @@ class DatasetHelper:
 
         generator.reset()
 
-        for i in tqdm(range(stop_condition)):
+        generated = 0
+        for i in tqdm(range(stop_condition), disable=disable_tqdm):
             imgages,targets = generator.next()
             #print(np.unique(targets,axis=0, return_counts=True))
             #break
             X=np.concatenate((X,imgages), axis=0)
             Y=np.concatenate((Y,targets), axis=0)
+            generated += len(imgages)
+        print(f"{generated} images generated")
 
         X = self.normalize(X,norm_mode)
         return X,Y
@@ -168,15 +168,21 @@ class DatasetHelper:
         partial = array / np.min(array[np.nonzero(array)])
         return partial / partial.sum()
 
-    def apply_data_augmentation_normalized(self, X, Y, num_of_images):
+
+
+    def apply_data_augmentation_normalized(self, X, Y, num_of_images, disable_tqdm = False):
         classes, classes_distributions = self.get_samples_distributions(Y)
-        classes_distributions = self.to_sum_1(num_of_images-classes_distributions)
+        to_equal = max(classes_distributions) - classes_distributions
+        to_equal = self.to_sum_1(to_equal + (num_of_images - sum(to_equal)) / len(classes))
         return self.apply_data_augmentation_with_classes_distribution(X, Y, num_of_images,
-                                                                      class_distribution = classes_distributions)
+                                                                      class_distribution = to_equal[::-1], disable_tqdm=True)
 
 
     #Get num_of_images augmented data respecting the desired class distribution
-    def apply_data_augmentation_with_classes_distribution(self,X,Y,num_of_images,class_distribution = [0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2],norm_mode=1):
+    def apply_data_augmentation_with_classes_distribution(self,X,Y,
+                                                          num_of_images,class_distribution = [0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2],
+                                                          norm_mode=1,
+                                                          disable_tqdm = False):
        #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
        # X = self.denormalize(X,norm_mode) #Denormalize #TODO CHECK CLEANER WAY!!
 
@@ -185,13 +191,14 @@ class DatasetHelper:
         out_y = np.empty((0,8))
 
         print("Data distribution = " + str(class_distribution))
-        for i in tqdm(range(Y.shape[1])):
-            print("Class: " + str(i+1))
+        for i in tqdm(range(Y.shape[1]),  disable=disable_tqdm):
+            # print("Class: " + str(i+1))
             #Get all element of slice i
             curr_x,curr_y = self.get_slice_of_class(X,Y,i+1)
-            print("Class Size : " + str(curr_x.shape[0]))
+            print(f"Class Size :  {str(curr_x.shape[0])}, generating: {int(num_of_images*class_distribution[i])}")
             #Apply Augmentation
-            curr_x,curr_y = self.apply_data_augmentation(curr_x,curr_y,num_of_images*class_distribution[i])
+            curr_x,curr_y = self.apply_data_augmentation(curr_x,curr_y,num_of_images*class_distribution[i],
+                                                         disable_tqdm=disable_tqdm)
             #Concatenate result of class i
             out_x=np.concatenate((out_x,curr_x), axis=0)
             out_y=np.concatenate((out_y,curr_y), axis=0)

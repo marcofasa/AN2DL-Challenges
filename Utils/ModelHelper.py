@@ -90,6 +90,24 @@ class ModelHelper:
         ax2.grid(alpha=.3)
         plt.show()
 
+    def show_predictions(self,X_test,Y_test,items_count=8):
+        predictions = self.model.predict(X_test)
+
+        items_showed = 0
+        fig, ax = plt.subplots(ncols=4, nrows=int(items_count/4)+1, figsize=(20,20))
+        for row in ax:
+            for j, col in enumerate(row):
+                if j%2 == 0:
+                    col.imshow(X_test[items_showed])
+                    col.title.set_text('True label: '+self.labels[np.argmax(Y_test[items_showed])])
+                else:
+                    col.barh(list(self.labels.values()), predictions[items_showed], color=plt.get_cmap('Paired').colors)
+                    col.title.set_text('Predicted label: '+ self.labels[np.argmax(predictions[items_showed])])
+                    items_showed += 1
+                    if items_showed > items_count:
+                        break
+        plt.show()
+
     #Save model To memory
     def save_model(self,model,name="Model"):
         model.save(os.path.join(self.models_dir, name))
