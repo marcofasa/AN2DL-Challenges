@@ -143,9 +143,14 @@ class DatasetHelper:
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
     def apply_data_augmentation(self, X, Y, num_of_images, norm_mode=1, 
-                                disable_tqdm=False, rotation_range=15, 
-                                width_shift_range=0.1, height_shift_range=0.1, 
-                                zoom_range=0.3, fill_mode="reflect", brightness_range=(0.5, 1.1)):
+                                disable_tqdm=False, rotation_range=15,
+                                width_shift_range=0.1,
+                                height_shift_range=0.1,
+                                zoom_range=0.3,
+                                fill_mode="reflect",
+                                horizontal_flip=True,
+                                vertical_flip=True,
+                                brightness_range=(0.5, 1.1)):
         # print("BB")
         X = self.denormalize(X, norm_mode) #Denormalize
         #TODO PARAMETRIZE THIS PART
@@ -155,9 +160,10 @@ class DatasetHelper:
             height_shift_range=height_shift_range,
             zoom_range=zoom_range,
             fill_mode=fill_mode,  # So that the fill is not strange
-            brightness_range=brightness_range
+            brightness_range=brightness_range,
+            horizontal_flip = horizontal_flip,
+            vertical_flip=vertical_flip,
             )
-
         i=0
         batch_size = 32
         stop_condition =  int(num_of_images / batch_size)
@@ -195,14 +201,28 @@ class DatasetHelper:
         partial = array / np.min(array[np.nonzero(array)])
         return partial / partial.sum()
 
-
-
-    def apply_data_augmentation_normalized(self, X, Y, num_of_images, disable_tqdm = False):
+    def apply_data_augmentation_normalized(self, X, Y, num_of_images, disable_tqdm=False,
+                                           rotation_range=15, width_shift_range=0.1,
+                                           height_shift_range=0.1, zoom_range=0.3,
+                                           fill_mode="reflect", brightness_range=(0.5, 1.1),
+                                           horizontal_flip=True,
+                                           vertical_flip=True,
+                                           ):
         classes, classes_distributions = self.get_samples_distributions(Y)
         to_equal = max(classes_distributions) - classes_distributions
         to_equal = self.to_sum_1(to_equal + (num_of_images - sum(to_equal)) / len(classes))
         return self.apply_data_augmentation_with_classes_distribution(X, Y, num_of_images,
-                                                                      class_distribution = to_equal[::-1], disable_tqdm=True)
+                                                                      disable_tqdm=disable_tqdm,
+                                                                      class_distribution=to_equal[::-1],
+                                                                      rotation_range=rotation_range,
+                                                                      width_shift_range=width_shift_range,
+                                                                      height_shift_range=height_shift_range,
+                                                                      zoom_range=zoom_range,
+                                                                      fill_mode=fill_mode,
+                                                                      brightness_range=brightness_range,
+                                                                      horizontal_flip=horizontal_flip,
+                                                                      vertical_flip=vertical_flip,
+                                                                      )
 
 
     #Get num_of_images augmented data respecting the desired class distribution
@@ -211,7 +231,10 @@ class DatasetHelper:
                                                           norm_mode=1, disable_tqdm=False,
                                                           rotation_range=15, width_shift_range=0.1, 
                                                           height_shift_range=0.1, zoom_range=0.3, 
-                                                          fill_mode="reflect", brightness_range=(0.5, 1.1)):
+                                                          fill_mode="reflect", brightness_range=(0.5, 1.1),
+                                                          horizontal_flip=True,
+                                                          vertical_flip=True,
+                                                          ):
        #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
        # X = self.denormalize(X,norm_mode) #Denormalize #TODO CHECK CLEANER WAY!!
 
@@ -229,7 +252,10 @@ class DatasetHelper:
             curr_x, curr_y = self.apply_data_augmentation(curr_x, curr_y, num_of_images*class_distribution[i],
                                                          disable_tqdm=disable_tqdm, rotation_range=rotation_range, width_shift_range=width_shift_range, 
                                                           height_shift_range=height_shift_range, zoom_range=zoom_range, 
-                                                          fill_mode=fill_mode, brightness_range=brightness_range)
+                                                          fill_mode=fill_mode, brightness_range=brightness_range,
+                                                          horizontal_flip=horizontal_flip,
+                                                          vertical_flip=vertical_flip,
+                                                          )
             #Concatenate result of class i
             out_x = np.concatenate((out_x, curr_x), axis=0)
             out_y = np.concatenate((out_y, curr_y), axis=0)
