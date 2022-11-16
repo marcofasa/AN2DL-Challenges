@@ -93,6 +93,28 @@ class DatasetHelper:
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
 
+    def get_class_i_vs_other(X,Y,i):
+        #Extract Class i
+        classes = np.argwhere(Y == 1) + 1
+        class_i_index = np.argwhere(classes == i)
+        class_i_index = class_i_index[:,0]
+
+        #Extract Others
+        classes = np.argwhere(Y == 1) + 1
+        class_not_i_index = np.argwhere(classes != i)
+        class_not_i_index = class_not_i_index[:,0]
+        
+        #Create new Label array
+        new_Y = np.empty((Y.shape[0],2))
+
+        #Assign new labels:
+        new_Y[class_i_index]    = [1,0]
+        new_Y[class_not_i_index]= [0,1]
+
+        return new_Y
+
+        
+        
     def get_samples_distributions(self, Y):
         classes, classes_distribution = np.unique(Y, axis=0, return_counts=True)
         classes = classes.argmax(1)
