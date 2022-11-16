@@ -7,9 +7,11 @@ from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
+
+
 class DatasetHelper:
-    #Path is the folder where we will have dataset,model_savings....
-    def __init__(self, path,seed, create_dirs = False):
+    # Path is the folder where we will have dataset, model_savings....
+    def __init__(self, path, seed, create_dirs=False):
         self.path = path
         self.dataset_folder = os.path.join(self.path, 'data')
         self.numpy_dataset  = os.path.join(self.path, 'data_numpy_format')
@@ -109,26 +111,29 @@ class DatasetHelper:
         return
 
     #Return A slice of X,Y with only element of class_to_get {eg all element of specie 1}
-    def get_slice_of_class(self,X,Y,class_to_get):
+    def get_slice_of_class(self, X, Y, class_to_get):
         classes = np.argwhere(Y == 1) + 1
         classes_index = np.argwhere(classes == class_to_get)
         classes_index = classes_index[:,0]
 
-        return X[classes_index],Y[classes_index]
+        return X[classes_index], Y[classes_index]
 
     #Generate a new X,Y with augmented data of "num_of_images"
     #TODO ADD SOME PARAMETER TO CHANGE AUGMENTATION TYPE
-    def apply_data_augmentation(self,X,Y,num_of_images,norm_mode = 1, disable_tqdm = False):
+    def apply_data_augmentation(self, X, Y, num_of_images, norm_mode=1, 
+                                disable_tqdm=False, rotation_range=15, 
+                                width_shift_range=0.1, height_shift_range=0.1, 
+                                zoom_range=0.3, fill_mode="reflect", brightness_range=(0.5, 1.1)):
         # print("BB")
-        X = self.denormalize(X,norm_mode) #Denormalize
+        X = self.denormalize(X, norm_mode) #Denormalize
         #TODO PARAMETRIZE THIS PART
         data_generator = ImageDataGenerator(
-            rotation_range = 15,
-            width_shift_range = 0.1,
-            height_shift_range = 0.1,
-            zoom_range = 0.3,
-            fill_mode = 'reflect',  #So that the fill is not strange
-            brightness_range = (0.5, 1.1)
+            rotation_range=rotation_range,
+            width_shift_range=width_shift_range,
+            height_shift_range=height_shift_range,
+            zoom_range=zoom_range,
+            fill_mode=fill_mode,  # So that the fill is not strange
+            brightness_range=brightness_range
             )
 
         i=0
@@ -156,13 +161,13 @@ class DatasetHelper:
             imgages,targets = generator.next()
             #print(np.unique(targets,axis=0, return_counts=True))
             #break
-            X=np.concatenate((X,imgages), axis=0)
-            Y=np.concatenate((Y,targets), axis=0)
+            X = np.concatenate((X,imgages), axis=0)
+            Y = np.concatenate((Y,targets), axis=0)
             generated += len(imgages)
         print(f"{generated} images generated")
 
         X = self.normalize(X,norm_mode)
-        return X,Y
+        return X, Y
 
     def to_sum_1(self, array: np.ndarray):
         partial = array / np.min(array[np.nonzero(array)])
@@ -179,29 +184,33 @@ class DatasetHelper:
 
 
     #Get num_of_images augmented data respecting the desired class distribution
-    def apply_data_augmentation_with_classes_distribution(self,X,Y,
-                                                          num_of_images,class_distribution = [0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2],
-                                                          norm_mode=1,
-                                                          disable_tqdm = False):
+    def apply_data_augmentation_with_classes_distribution(self, X, Y,
+                                                          num_of_images, class_distribution = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+                                                          norm_mode=1, disable_tqdm=False,
+                                                          rotation_range=15, width_shift_range=0.1, 
+                                                          height_shift_range=0.1, zoom_range=0.3, 
+                                                          fill_mode="reflect", brightness_range=(0.5, 1.1)):
        #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
        # X = self.denormalize(X,norm_mode) #Denormalize #TODO CHECK CLEANER WAY!!
 
         print("Data Augmentation with data distribution")
-        out_x = np.empty((0,96,96,3))
-        out_y = np.empty((0,8))
+        out_x = np.empty((0, 96, 96, 3))
+        out_y = np.empty((0, 8))
 
         print("Data distribution = " + str(class_distribution))
         for i in tqdm(range(Y.shape[1]),  disable=disable_tqdm):
             # print("Class: " + str(i+1))
             #Get all element of slice i
-            curr_x,curr_y = self.get_slice_of_class(X,Y,i+1)
+            curr_x, curr_y = self.get_slice_of_class(X, Y, i+1)
             print(f"Class Size :  {str(curr_x.shape[0])}, generating: {int(num_of_images*class_distribution[i])}")
             #Apply Augmentation
-            curr_x,curr_y = self.apply_data_augmentation(curr_x,curr_y,num_of_images*class_distribution[i],
-                                                         disable_tqdm=disable_tqdm)
+            curr_x, curr_y = self.apply_data_augmentation(curr_x, curr_y, num_of_images*class_distribution[i],
+                                                         disable_tqdm=disable_tqdm, rotation_range=rotation_range, width_shift_range=width_shift_range, 
+                                                          height_shift_range=height_shift_range, zoom_range=zoom_range, 
+                                                          fill_mode=fill_mode, brightness_range=brightness_range)
             #Concatenate result of class i
-            out_x=np.concatenate((out_x,curr_x), axis=0)
-            out_y=np.concatenate((out_y,curr_y), axis=0)
+            out_x = np.concatenate((out_x, curr_x), axis=0)
+            out_y = np.concatenate((out_y, curr_y), axis=0)
 
         #out_x = self.normalize(out_x,norm_mode)
 
@@ -209,7 +218,7 @@ class DatasetHelper:
         p = np.random.permutation(out_x.shape[0])
         out_x = out_x[p]
         out_y = out_y[p]
-        return out_x,out_y
+        return out_x, out_y
 
     #Allow to save all images directly in numpy format, no need to load them 1 by one (fasten up the data augmentation problem)
     #TODO COMPLETE THIS FUNCTION (load function dosnt work properly)
@@ -226,7 +235,7 @@ class DatasetHelper:
                 return X,Y
             else:
                 #Load dataset using ImageDataGenerator
-                X,Y = self.load_Dataset(10)
+                X, Y = self.load_Dataset(10)
 
                 #Save Numpy arrays to file
                 np.save(os.path.join(self.numpy_dataset, 'images'), X)
