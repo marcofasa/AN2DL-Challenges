@@ -181,16 +181,16 @@ class DatasetHelper:
 
 
 
-    def apply_data_augmentation_normalized(self, X, Y, num_of_images, disable_tqdm = False, class_distribution = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-                                                          norm_mode=1,
-                                                          rotation_range=15, width_shift_range=0.1, 
-                                                          height_shift_range=0.1, zoom_range=0.3, 
-                                                          fill_mode="reflect", brightness_range=(0.5, 1.1)):
+    def apply_data_augmentation_normalized(self, X, Y, num_of_images, 
+                                            disable_tqdm=False, norm_mode=1,
+                                            rotation_range=15, width_shift_range=0.1, 
+                                            height_shift_range=0.1, zoom_range=0.3, 
+                                            fill_mode="reflect", brightness_range=(0.5, 1.1)):
         classes, classes_distributions = self.get_samples_distributions(Y)
         to_equal = max(classes_distributions) - classes_distributions
         to_equal = self.to_sum_1(to_equal + (num_of_images - sum(to_equal)) / len(classes))
         return self.apply_data_augmentation_with_classes_distribution(X, Y, num_of_images,
-                                                                      class_distribution = to_equal[::-1], disable_tqdm=True, class_distribution = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+                                                                        class_distribution = to_equal[::-1], disable_tqdm=True,
                                                                         norm_mode=1, disable_tqdm=False,
                                                                         rotation_range=15, width_shift_range=0.1, 
                                                                         height_shift_range=0.1, zoom_range=0.3, 
