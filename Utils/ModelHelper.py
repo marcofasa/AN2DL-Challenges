@@ -143,12 +143,16 @@ class ModelHelper:
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
     #Calculate and show the confusion matrix of the model
-    def show_confusion_matrix(self,x_test,y_test):
-        if self.model == None:
+    def show_confusion_matrix(self,x_test,y_test,model=None):
+        if model == None:
+            model = self.model
+
+        if model == None:
             print("No Model Loaded in this helper class, try use save_model(model,name) function")
             return None
         
-        predictions = self.model.predict(x_test)
+        predictions = model.predict(x_test)
+
         # Build the confusion matrix (using scikit-learn)
         cm = confusion_matrix(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1))
 
@@ -157,6 +161,7 @@ class ModelHelper:
         precision = precision_score(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1), average='macro') # macro-> maetric for each class and the compute avg
         recall = recall_score(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1), average='macro')
         f1 = f1_score(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1), average='macro')
+
         print('Accuracy:',accuracy.round(4))
         print('Precision:',precision.round(4))
         print('Recall:',recall.round(4))
