@@ -143,7 +143,10 @@ class ModelHelper:
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
     #Calculate and show the confusion matrix of the model
-    def show_confusion_matrix(self,x_test,y_test):
+    def show_confusion_matrix(self,x_test,y_test,model = None):
+        if self.model != None:
+            self.model = model
+            
         if self.model == None:
             print("No Model Loaded in this helper class, try use save_model(model,name) function")
             return None

@@ -93,7 +93,7 @@ class DatasetHelper:
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
 
-    def get_class_i_vs_other(self,X,Y,i):
+    def get_class_i_vs_other(self,X,Y,i,class_i_lab=[1.0,0.0],class_other_lab=[0.0,1.0],num_of_class=2):
         #Extract Class i
         classes = np.argwhere(Y == 1) + 1
         classes = classes[:,1]
@@ -105,12 +105,17 @@ class DatasetHelper:
         class_not_i_index = class_not_i_index[:,0]
 
         #Create new Label array
-        new_Y = np.zeros((Y.shape[0],2))
+        new_Y = np.zeros((Y.shape[0],num_of_class))
 
         #Assign new labels:
+        '''
         new_Y[class_i_index]    = [1.0,0.0]
         new_Y[class_not_i_index]= [0.0,1.0]
-        
+        '''
+        new_Y[class_i_index]    = class_i_lab
+        new_Y[class_not_i_index]= class_other_lab
+        print("BANANA")
+
         print("Class in i: " , class_i_index.shape)
         print("Class in others: " , class_not_i_index.shape)
         return new_Y
