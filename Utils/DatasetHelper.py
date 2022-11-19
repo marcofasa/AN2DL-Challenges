@@ -93,6 +93,30 @@ class DatasetHelper:
         return X_train,X_test,X_val,Y_train,Y_test,Y_val
 
 
+    def get_class_i_vs_other(self,X,Y,i):
+        #Extract Class i
+        classes = np.argwhere(Y == 1) + 1
+        classes = classes[:,1]
+        class_i_index = np.argwhere(classes == i)
+        class_i_index = class_i_index[:,0]
+
+        #Extract Others
+        class_not_i_index = np.argwhere(classes != i)
+        class_not_i_index = class_not_i_index[:,0]
+
+        #Create new Label array
+        new_Y = np.zeros((Y.shape[0],2))
+
+        #Assign new labels:
+        new_Y[class_i_index]    = [1.0,0.0]
+        new_Y[class_not_i_index]= [0.0,1.0]
+
+        print("Class in i: " , class_i_index.shape)
+        print("Class in others: " , class_not_i_index.shape)
+        return new_Y
+
+
+
     def get_samples_distributions(self, Y):
         classes, classes_distribution = np.unique(Y, axis=0, return_counts=True)
         classes = classes.argmax(1)
@@ -209,7 +233,7 @@ class DatasetHelper:
     #Get num_of_images augmented data respecting the desired class distribution
     def apply_data_augmentation_with_classes_distribution(self, X, Y,
                                                           num_of_images, class_distribution = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
-                                                          norm_mode=1, disable_tqdm=False,
+                                                          norm_mode=1, disable_tqdm=True,
                                                           rotation_range=15, width_shift_range=0.1, 
                                                           height_shift_range=0.1, zoom_range=0.3, 
                                                           fill_mode="reflect", brightness_range=(0.5, 1.1),
@@ -222,7 +246,7 @@ class DatasetHelper:
 
         print("Data Augmentation with data distribution")
         out_x = np.empty((0, 96, 96, 3))
-        out_y = np.empty((0, 8))
+        out_y = np.empty((0, Y.shape[1]))
 
         print("Data distribution = " + str(class_distribution))
         for i in tqdm(range(Y.shape[1]),  disable=disable_tqdm):
