@@ -128,7 +128,8 @@ class DatasetHelper:
                                 fill_mode="reflect",
                                 horizontal_flip=True,
                                 vertical_flip=True,
-                                brightness_range=(0.5, 1.1)):
+                                brightness_range=(0.5, 1.1),
+                                seed = 10):
         # print("BB")
         X = self.denormalize(X, norm_mode) #Denormalize
         #TODO PARAMETRIZE THIS PART
@@ -153,7 +154,7 @@ class DatasetHelper:
                                     batch_size=32,
                                     shuffle=True,
                                     sample_weight=None,
-                                    seed=self.seed,
+                                    seed=seed,
                                     save_to_dir=None,
                                     save_format='png',
                                     ignore_class_split=False,
@@ -185,6 +186,7 @@ class DatasetHelper:
                                            fill_mode="reflect", brightness_range=(0.5, 1.1),
                                            horizontal_flip=True,
                                            vertical_flip=True,
+                                           seed=10
                                            ):
         classes, classes_distributions = self.get_samples_distributions(Y)
         to_equal = max(classes_distributions) - classes_distributions
@@ -200,6 +202,7 @@ class DatasetHelper:
                                                                       brightness_range=brightness_range,
                                                                       horizontal_flip=horizontal_flip,
                                                                       vertical_flip=vertical_flip,
+                                                                      seed = seed
                                                                       )
 
 
@@ -212,6 +215,7 @@ class DatasetHelper:
                                                           fill_mode="reflect", brightness_range=(0.5, 1.1),
                                                           horizontal_flip=True,
                                                           vertical_flip=True,
+                                                          seed = 10,
                                                           ):
        #TODO FOR MORE COMPLEX NORMALIZATION TYPE WE NEED TO CHANGHE THIS
        # X = self.denormalize(X,norm_mode) #Denormalize #TODO CHECK CLEANER WAY!!
@@ -233,6 +237,7 @@ class DatasetHelper:
                                                           fill_mode=fill_mode, brightness_range=brightness_range,
                                                           horizontal_flip=horizontal_flip,
                                                           vertical_flip=vertical_flip,
+                                                          seed = seed
                                                           )
             #Concatenate result of class i
             out_x = np.concatenate((out_x, curr_x), axis=0)
