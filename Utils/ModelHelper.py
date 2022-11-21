@@ -14,14 +14,7 @@ from PIL import Image
 from tensorflow import keras
 from datetime import datetime
 import keras.backend as K
-def F1(y_true, y_pred): #taken from old keras source code
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-    precision = true_positives / (predicted_positives + K.epsilon())
-    recall = true_positives / (possible_positives + K.epsilon())
-    f1_val = 2*(precision*recall)/(precision+recall+K.epsilon())
-    return f1_val
+
 
 class ModelHelper:
     seed = 42
@@ -151,11 +144,6 @@ class ModelHelper:
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
     #Calculate and show the confusion matrix of the model
-    def show_confusion_matrix(self,x_test,y_test,model = None):
-        if self.model != None:
-            self.model = model
-            
-        if self.model == None:
     def show_confusion_matrix(self,x_test,y_test,model=None):
         if model == None:
             model = self.model
