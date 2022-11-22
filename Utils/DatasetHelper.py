@@ -119,8 +119,8 @@ class DatasetHelper:
         new_Y[class_not_i_index]= class_other_lab
         print("BANANA")
 
-        print("Class in i: ", class_i_index.shape)
-        print("Class in others: ", class_not_i_index.shape)
+        print("Class in i: " , class_i_index.shape)
+        print("Class in others: " , class_not_i_index.shape)
         return new_Y
 
     def get_samples_distributions(self, Y):
