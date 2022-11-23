@@ -46,6 +46,7 @@ If included, an abstract should be a single paragraph.
 {\bf Keywords:} VGG16, VGG19, Helpful
 
 \section{Introduction}
+\subsection{Classic Net}
 
 We have based this SDSS template almost entirely on the template for
 the annual conference of the Association for Computational Linguistics (ACL), whose
@@ -65,14 +66,14 @@ instructions of the {\em International Joint Conference on Artificial
   Intelligence}.
 \end{quotation}
 
-\section{Methods}
+\section{VGG19}
 
 In preparing the extended abstract,
 we strongly encourage using the same four section headings seen here, namely,
 Introduction, Methods, Data (or Results), and Discussion (or Conclusions).
 Use of subsections is at the authors' discretion; see Section~\ref{info-on-sections}.
 
-\subsection{Font Sizes and Layout}
+\subsection{Approach: Freezing Layers}
 Extended abstracts should be no more than two pages, including references,
 in 10-point Times Roman font and two-column format, and must be submitted as pdf documents.
 The \LaTeX\ template automatically uses the {\tt newtx} package if available
@@ -94,31 +95,27 @@ Margins should not be altered from those used in the template files.
 \begin{tabular}{|c|l|l|l|l|l}
 
 \hline \bf Freezed Layers & \bf Accuracy & \bf Precision & \bf Recall & \bf F1 \\ \hline
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
-8 & 15 pt & bold & 15 pt & bold\\
+8 & 0.8169 & 0.7989 & 0.7651 & 0.763\\
+9 & 0.8225 & 0.8181 & 0.7682 & 0.7776\\
+10 & 0.8338 & 0.8161 & 0.7929 & 0.8001\\
+11 & 0.7577 & 0.7109 & 0.715 & 0.7048\\
+12 & 0.7944 & 0.766 & 0.7504 & 0.7489\\
+13 & 0.8028 & 0.7806 & 0.754 & 0.7596\\
 \hline
 \end{tabular}
 \end{adjustbox}
-\caption{Results with Transfer Learning and Number of freezed layers for VGG19}
+\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
 \end{table}
 
 
-\subsection{Sections}
-\label{info-on-sections}
+\begin{figure}[ht]
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{VGG19_best}}
+\caption{Confusion Matrix of best configuration with VGG19.}
+\label{bayespic}
+\end{center}
+\end{figure}
 
-{\bf Headings}: While it is permissible to use bold print to introduce a paragraph
-as seen here, please use the \verb+\section+,
-\verb+\subsection+, and \verb+\subsubsection+
-commands as in this \LaTeX\ document.  If you are using MS Word, please duplicate
-the numbering and font-size conventions in this document.
-
-\subsubsection{Numbering Sections}
-As shown here, all sections, sub-sections, and sub-subsections are numbered.
 
 \subsection{Citations}
 
@@ -168,14 +165,7 @@ possible.  It is acceptable that wide illustrations
 may run across both columns.  The use of color
 is allowed in extended abstract graphics.
 
-\begin{figure}[ht]
-\begin{center}
-\centerline{\includegraphics[width=\columnwidth]{VGG19_best}}
-\caption{Ironically, Thomas Bayes was never asked to provide additional
-simulation studies in the Results sections of his papers.}
-\label{bayespic}
-\end{center}
-\end{figure}
+
 
 \subsection{Captions}
 Provide a caption below every figure and table; number each one
