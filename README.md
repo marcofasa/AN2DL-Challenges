@@ -1,5 +1,5 @@
 # Artificial Neural Networks & Deep Learning Challenges
-This repository is intended for the challenges of the Artificial Neural Networks and Deep Learning at PoliMi.
+This repository is intended for the challenges of the **Artificial Neural Networks and Deep Learning** at PoliMi.
 
 ## Team members
 Lexicographic order by surname:
