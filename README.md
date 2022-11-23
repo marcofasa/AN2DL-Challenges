@@ -24,4 +24,5 @@ The metric used to evaluate models and place the Teams in Leadeboard is the Tota
 <p align="center">
   $\frac{1}{N}\sum_{1\leq i \leq N} \text{predictions}_i == \text{targets}_i$
 </p>
+
 where $N$ is the total number of images in the test set (never seen).
