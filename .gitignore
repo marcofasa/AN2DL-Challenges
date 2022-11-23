@@ -1,5 +1,8 @@
 *.xml
 *.iml
+*.synctex.gz
+*.log
+*.aux
 /.idea
 Homework1/local_saved_models/* 
 Homework1/local_checkpoints/* 
