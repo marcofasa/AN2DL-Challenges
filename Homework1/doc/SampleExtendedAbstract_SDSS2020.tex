@@ -42,14 +42,22 @@ Homework 1}
 %{\bf Keywords:} VGG16, VGG19, Helpful
 
 \section{Introduction}
---MARCO--
-
-TUTTE LE TECNICHE USATE
-come abbiamo pensato di approcciare.
-Idee e risultati
-Timeline di quello fatto.
-Riassiunto delle metodologie e delle CNN
-\subsection{Classic Net}
+In order to touch all the important aspects of the procedure of finding the best solution to this classification problem,
+we started from our own self-made model to more sophisticated methodologies.\\
+ We can summarize our approaches in:
+\begin{itemize}
+  \item Vanilla network
+  \item Transfer Learning and Fine Tuning
+  \item Ensemble method
+\end{itemize}
+Furthermore in all the attempts made, we used two classes, specifically \textbf{created to automate and support the model creation
+procedure}:
+\begin{itemize}
+  \item Dataset Helper
+  \item Model Helper
+\end{itemize}
+Through the continuous attempts, and support of methods in the two helper classes, we managed to find our best model and
+reach 0.8691 accuracy in the competiton.
 
 
 \section{Dataset Helper and Model Helper}
@@ -63,23 +71,28 @@ lista delle funzioni e automatizzazione
 risultati
 considerazioni
 \subsection{Batch Normalization}
-A first attempt was adding a Batch Normalization + Relu Activation Layer before our Pooling layers.\
+A first attempt was also adding a Batch Normalization + Relu Activation Layer before our Pooling layers.\
 This lead to poor result due to the fact that the network was too small.
 \subsection{Our homemade CNN}
+So deepening the CNN gave this solution much significant improvements.\\
+METTERE IMMAGINE CNN FINALE
 --- RAFFAELLO---
+
+
 \subsection{Considerations}
 Best result consideration and observations
 \section{Transfer Learning and Fine Tuning}
-transfer leraning e modelli usati
+We then noticed that we needed a big change on the approach to use, because the homemade
+CNN was performant, but not enough. So \textbf{we started using transfer learning and Fine tuning}
+
 \subsection{Approach: Freezing Layers}
-Idea sulla freezing
+The \textit{modus operandi} that will be used from now is: freezing all layers while training on our augmented dataset the keras.application
+CNN, and then unlock a small amount of layers to the second phase of training (fine tuning) as near as possible to the output.
 \subsection{VGG19}
-
---MARCO--
-Spiegazione modell + prove fatte
+VGG-19 is a convolutional neural network that is 19 layers deep, so we kept the freezed layers in the range of the first 8-14.\\
+Different Data Augmentations (with different seeds and augmentation parameters) were performed between the two phases,
+to even increase randomisation in the two training processes.
 \subsubsection{Results}
-
-
 \begin{table}[ht]
 \centering
 \begin{adjustbox}{width=240}
@@ -107,7 +120,9 @@ Spiegazione modell + prove fatte
 \label{bayespic}
 \end{center}
 \end{figure}
-
+\subsubsection{Considerations}
+One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
+until the pooling and not between convolutions leads to a better accuracy.
 
 \subsection{VGG16}
 --CHRISTIAN--
@@ -147,7 +162,7 @@ con più tempo cosa avremmo provato
 \begin{tabular}{|c|l|l|l|l|l}
 
 \hline \bf Description & \bf Result \\ \hline
-a & 0.8169 \\
+VGG19 - 10 Freezed Layers & 0.823015873 \\
 b & 0.8225 \\
 
 \hline
