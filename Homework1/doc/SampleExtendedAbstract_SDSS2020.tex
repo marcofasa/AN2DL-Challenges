@@ -14,7 +14,7 @@ Homework 1}
 
 \author{
   Nicola Dean \\
-  10617541 \\
+  10674826 \\
   {\tt nicola.dean \\
   \tt @mail.polimi.it} \\\And
   Marco Fasanella \\
@@ -136,15 +136,13 @@ to even increase randomisation in the two training processes.
 One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
 until the pooling and not between convolutions leads to a better accuracy.
 
-\subsection{VGG16}
---CHRISTIAN--
-Spiegazione modell + prove fatte
 \subsubsection{Results}
 \subsection{Xception}
-Xception is the evolution google proposed to their \textbf{"Inception-v3"} model, this model contain \textbf{666 layers} of \textbf{"depthwise separable convolution"}.\\
-We decided to try this model to see if this particular kind of convolution would extract better features for our model.
-Unfortunatly we couldnt find a configuration that beats our best models at the time (but performance where realy similar to vgg16)
-PUT DATA IN TABLEEEEEEEEEEE
+Xception is the evolution google proposed to their \textbf{"Inception-v3"} model, this model contain \textbf{131 layers} of \textbf{"depthwise separable convolution"}.\\
+We decided to try this model to see if this particular kind of convolution would extract better features for our model and if this would increase Specie1 and Specie6 F1.\\
+The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling but
+unfortunatly the performance obtained wasnt so different from our best model at the time, VGG16.
+
 \begin{table}[ht]
   \centering
   \begin{adjustbox}{width=240}
@@ -152,29 +150,55 @@ PUT DATA IN TABLEEEEEEEEEEE
   \begin{tabular}{|c|l|l|l|l|l}
   
   \hline \bf Freezed Layers & \bf Accuracy & \bf Precision & \bf Recall & \bf F1 \\ \hline
-  20 & 0.8169 & 0.7989 & 0.7651 & 0.763\\
-  15 & 0.8225 & 0.8181 & 0.7682 & 0.7776\\
-  20 -\> 1 & 0.8338 & 0.8161 & 0.7929 & 0.8001\\
+  Transfer-Learn & 0.5734 & 0.5942 & 0.5344 & 0.5376\\
+  20 & 0.6328 & 0.5903 & 0.5855 & 0.5852\\
+  15 & Lost Result & but similar &to 20 &freezed layer\\
+  1 & 0.8136 & 0.7869 & 0.7751 & 0.7763\\
   \hline
   \end{tabular}
   \end{adjustbox}
   \caption{Some of the best results of FineTuning using Xception}
   \end{table}
 \subsection{Other Models}
+In parallel to fine tuning we had tried different modify to the "home made CNN", one of them was adding skip layers to it to avoid \textbf{vanishing gradient}.\\
+We failed to implement them in a performant way, but this bring us to the next model of this FineTuning section: Resnet50-v2.\\
+We thought that maybe we were doing something wrong with skip layer, so to prove it we decided to give a try to Resnet.
 \subsubsection{Resnet}
---NICOLA--
+Unfortunatly during the various modify of the notebook we lost the cell with the saved "old performaces" and we have only the ones of the best model we get out of Resnet.\\
+We had different try on the Final Dense size and the best we could get on base model was with Flattening + Dense of 256 + Dropout 0.2
+With 
 \subsubsection{GoogleNet}
 \subsection{EfficientNet}
---NICOLA--
-
+As last option we decided to give a try to one of the "BIG" models on keras.application;
+Initialy we were discoraged by the huge number of parameter (on colab we hadn't managed to load it due to ram issue for example)
+but we wanted to give it a try since it's architecture was different from already tried models, and on keras.application was the best on TOP1 accuracy.\\
+As already said, it was a little hard to work with this model given our resources so we used an approach not 100\% correct.
+Thats said, to select the best hyperparameter we started to train only few epochs and keep running ONLY if it was promising (probably not the best approach).\\
+The model resulted to be promising, since the simple transfer learning managed to get 71\% of accuracy localy, and then we started experimenting fine tuning.\\
+We discovered that with a big number of freezed layers during fine tuning thare was no significant improvements.\\
+Those improvements come when the num of freezed layers was around 200, 100, precisely this last one was the best with an 85/86\% 
+After this, since both Resnet50 and Xception was performing well with "FULL unfreezed" we tried, for curiosity, to apply 30 more epochs with full unfreezed layers and discovered this give the model good increase on performances , precisely of 2/3 \% localy!!!
+We tried also the opposite (first full unfreezed and then 100 layer) but this was not effective,actualy it performed worst.
 
 
 \section{Ensemble}
---NICOLA--
-Approccio
-provato a mischiare modelli
-          c'era bias perchè avevano seed diversi
-\subsubsection{Results}
+The ensemble techniques consist into combining multiple models together to create a more robust and accurate one.\\
+The idea behind is that we can take our best models, and apply a majority voting on the predicted species.
+This will grant more robustness, since wrong choice come from majority of models predicting wrong species.
+
+The improvement was as expected, pretty high, but localy we get a "biased" result since the EfficientNet was trained using a different random seed so different test/train split.. and was too late to retrain such a huge model.
+so we will use CodaLab accuracy as metrics here:
+\begin{itemize}
+  \item \textbf{Development Phase:} 87.89\%
+  \item \textbf{Filan Phase:} 86.91\%
+\end{itemize}
+
+This ensemble combine together our best 7: Xception, Vgg16, Vgg19, Resnet, EfficientNet, HomeMade good, and First Homemade.
+
+\subsubsection{Better approach}
+At this moment the time was end, and we couldn't do more test but a thing we would have wanted to do was apply ensemble with some more "intelligently" chosen models.
+Eg: chose models with a particular confusion matrix so to maximize the concept of majority voting
+An example was chosing some models that work well on certain species to avoid false positive/false negative on that species.
 
 
 
@@ -192,12 +216,16 @@ con più tempo cosa avremmo provato
 \begin{tabular}{|c|l|l|l|l|l}
 
 \hline \bf Model & \bf Details & \bf Result \\ \hline
-VGG16 & 8 Freezed Layers & 0.8325 \\
-VGG19 & 10 Freezed Layers & 0.8230 \\
+HM_{CNN} & 8 Layers & ???? \\
+VGG16   & 8 Freezed Layers & 0.8325 \\
+VGG19   & 10 Freezed Layers & 0.8230 \\
+EfficientNet   & 100 Freezed Layers & 0.8390 \\
+EfficientNet   & 100 Freezed Layers  Run + 1 Freezed Layer Run& 0.8490 \\
+Ensemble & 7 Best Model Majority Voting & 0.8780 \\
 \hline
 \end{tabular}
 \end{adjustbox}
-\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
+\caption{Our Best submission on Codalab}
 \end{table}
 %{\bf Footnotes}: Note di sotto.}.
 \section{Conclusions}
