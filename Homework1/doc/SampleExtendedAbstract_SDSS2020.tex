@@ -57,7 +57,7 @@ procedure}:
   \item Model Helper
 \end{itemize}
 Through the continuous attempts, and support of methods in the two helper classes, we managed to find our best model and
-reach 0.8691 accuracy in the competiton.
+reach 0.8691 accuracy in the competition.
 
 
 \section{Dataset Helper and Model Helper}
@@ -76,10 +76,24 @@ considerazioni
 \subsection{Batch Normalization}
 A first attempt was also adding a Batch Normalization + Relu Activation Layer before our Pooling layers.\
 This lead to poor result due to the fact that the network was too small.
+
 \subsection{Our homemade CNN}
-So deepening the CNN gave this solution much significant improvements.\\
-METTERE IMMAGINE CNN FINALE
---- RAFFAELLO---
+After some attempts on small vanilla networks with poor results we've tried to improve the network by adding some more layers with more filters.
+We combined different parameters: kernel size, number of filters, number of layers, units of the dense layers.
+After some trials we noticed that we weren't reaching any significant improvement (very low test scores, around 0.5/06 of accuracy).
+All of these trials were made with a small dataset (4000 images), but after the work done on augmentation (\ref{subsec:augmentation}) the same model performed much better reaching 0.80/0.85 on test set.
+We noticed though the model wasn't much reliable since on codalab it performed around 0,78.
+
+
+\subsection{Augmentation}\label{subsec:augmentation}
+Since vanilla networks weren't providing good results we decided to focus on data.
+First of all we decided to generate a number of images so that the ratio $images_{specie_i}/tot_{images}$ was almost the same for each specie $i$.
+then we started exploiting all the functionalities of ImageDataGenerator in order to generate as much images as possible so that the network could extract them without overfitting.
+By doing this we started reaching higher accuracies deduced that the image dataset shouldn't be smaller then 10k images.
+With further search we noticed smaller - but significant - improvements until 25k images.
+After that we decided to improve the generalization ability of the network by augmenting the images with CutMix, MixUp, GridMask and Grayscale.
+This turned out to be another small but significant improvement on the accuracy, reaching 3/4 percentage points on test accuracy, depending also on the model used.
+
 
 
 \subsection{Considerations}
@@ -151,7 +165,7 @@ until the pooling and not between convolutions leads to a better accuracy.
 --NICOLA--
 Approccio
 provato a mischiare modelli
-          c'era bias perchè avevano seed diversi
+          c'era bias perché avevano seed diversi
 \subsubsection{Results}
 
 
