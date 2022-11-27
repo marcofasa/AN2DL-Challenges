@@ -143,16 +143,20 @@ class ModelHelper:
         for i in range(n):
             tfk.plot_latent_filters(model, layers, X_train[random.randint(0, len(X_train))])
 
+    def set_model(self,model):
+        print("Set Model to Model Helper")
+        self.model = model
+
     #Calculate and show the confusion matrix of the model
     def show_confusion_matrix(self,x_test,y_test,model=None):
-        if model == None:
-            model = self.model
+        if model != None:
+            self.set_model(model)
 
-        if model == None:
+        if self.model == None:
             print("No Model Loaded in this helper class, try use save_model(model,name) function")
             return None
         
-        predictions = model.predict(x_test)
+        predictions = self.model.predict(x_test)
 
         # Build the confusion matrix (using scikit-learn)
         cm = confusion_matrix(np.argmax(y_test, axis=-1), np.argmax(predictions, axis=-1))
