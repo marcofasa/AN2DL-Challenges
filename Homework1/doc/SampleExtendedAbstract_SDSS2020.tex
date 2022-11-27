@@ -61,9 +61,12 @@ reach 0.8691 accuracy in the competiton.
 
 
 \section{Dataset Helper and Model Helper}
---CHRISTIAN--
-Spiegazione delle due classi: \
-lista delle funzioni e automatizzazione
+In order to ease the development of our best solution, we thought it would have been useful to create two ad-hoc helper libraries. As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy). In particular, what we did was to create two helpers:
+\begin{itemize}
+    \item \textbf{Dataset helper}: for dealing with everything related to the dataset; for instance (just for mentioning the most relevant functions) we created functions to perform \textit{augmentation} and \textit{cut-out/cut-mix} of the dataset. Other functions were intended for processing data (e.g., normalization)
+    \item \textbf{Model helper}: for dealing with everything related to the models; this helper was intended for easing the construction of models. For instance, we create some functions for plotting insightful graphs (e.g., confusion matrix, residuals, predictions, etc.) and some other functions for managing the models (e.g., save the model in a specified directory or create checkpoints during training)
+\end{itemize}
+At the end, these helpers indeed turned out to be really helpful. Just with a line we had everything we needed. 
 
 \section{First try: vanilla network}
 --NICOLA--
@@ -80,7 +83,8 @@ METTERE IMMAGINE CNN FINALE
 
 
 \subsection{Considerations}
-Best result consideration and observations
+Best result consideration and observations \\
+Commento da Christian: qui specifichiamo l'importanza della augmentation e che abbiamo pensato potesse risolvere il problema della bassa accuracy (infatti alla fine è megliorato) + che poi abbiamo espanso con cut-out e cut-mix -- magari dire brevemente il perché, secondo noi, con augmentation/cutout è migliorato.
 \section{Transfer Learning and Fine Tuning}
 We then noticed that we needed a big change on the approach to use, because the homemade
 CNN was performant, but not enough. So \textbf{we started using transfer learning and Fine tuning}
@@ -88,6 +92,14 @@ CNN was performant, but not enough. So \textbf{we started using transfer learnin
 \subsection{Approach: Freezing Layers}
 The \textit{modus operandi} that will be used from now is: freezing all layers while training on our augmented dataset the keras.application
 CNN, and then unlock a small amount of layers to the second phase of training (fine tuning) as near as possible to the output.
+\subsection{VGG16}
+The first network we decided to utilize with this approach was VGG16. We started from this network mainly because, generally speaking, it has given great results in many different Deep Learning tasks; so, we thought it was a good network to start with. Indeed, at the end, it did not deceive us. More in details, at the very first we trained this network neither applying augmentation nor fine-tuning. However, as expected, we got poor results (an accuracy of about $60\%$). Applying data-augmentation, the accuracy risen up to roughly $70\%$, that is an improvement in accuracy of $10\%$.\\
+At this point, to boost up even more the accuracy, we decided to do fine-tuning treating the number of freezed layer as an hyperparameter to be learned. Indeed, we trained the network with $k$ freezed layers and we pick up the one such that
+\begin{equation*}
+    k^* = \underset{k}{\operatorname{argmax}}\{test\_accuracy_{k}\}
+\end{equation*}
+TO BE CONTINUED...
+\subsubsection{Results}
 \subsection{VGG19}
 VGG-19 is a convolutional neural network that is 19 layers deep, so we kept the freezed layers in the range of the first 8-14.\\
 Different Data Augmentations (with different seeds and augmentation parameters) were performed between the two phases,
@@ -124,10 +136,6 @@ to even increase randomisation in the two training processes.
 One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
 until the pooling and not between convolutions leads to a better accuracy.
 
-\subsection{VGG16}
---CHRISTIAN--
-Spiegazione modell + prove fatte
-\subsubsection{Results}
 \subsection{Xception}
 
 \subsection{Other Models}
@@ -161,10 +169,9 @@ con più tempo cosa avremmo provato
 \small
 \begin{tabular}{|c|l|l|l|l|l}
 
-\hline \bf Description & \bf Result \\ \hline
-VGG19 - 10 Freezed Layers & 0.823015873 \\
-b & 0.8225 \\
-
+\hline \bf Model & \bf Details & \bf Result \\ \hline
+VGG16 & 8 Freezed Layers & 0.8325 \\
+VGG19 & 10 Freezed Layers & 0.8230 \\
 \hline
 \end{tabular}
 \end{adjustbox}
