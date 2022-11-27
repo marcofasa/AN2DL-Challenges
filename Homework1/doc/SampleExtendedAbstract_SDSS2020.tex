@@ -35,59 +35,64 @@ Homework 1}
 
 \begin{document}
 \maketitle
-\begin{abstract}
-This document provides a basic template for the 2-page extended abstract
-and some submission guidelines. The authors' names and affiliations should not be included. \footnote{Footnotes are also in smaller font.
-See Table~\ref{fontsizes} for a list of font sizes.}
-Including an abstract is optional, as the document itself is an extended abstract.
-If included, an abstract should be a single paragraph.
-\end{abstract}
+%\begin{abstract}
 
-{\bf Keywords:} VGG16, VGG19, Helpful
+%\end{abstract}
+
+%{\bf Keywords:} VGG16, VGG19, Helpful
 
 \section{Introduction}
-\subsection{Classic Net}
+In order to touch all the important aspects of the procedure of finding the best solution to this classification problem,
+we started from our own self-made model to more sophisticated methodologies.\\
+ We can summarize our approaches in:
+\begin{itemize}
+  \item Vanilla network
+  \item Transfer Learning and Fine Tuning
+  \item Ensemble method
+\end{itemize}
+Furthermore in all the attempts made, we used two classes, specifically \textbf{created to automate and support the model creation
+procedure}:
+\begin{itemize}
+  \item Dataset Helper
+  \item Model Helper
+\end{itemize}
+Through the continuous attempts, and support of methods in the two helper classes, we managed to find our best model and
+reach 0.8691 accuracy in the competiton.
 
-We have based this SDSS template almost entirely on the template for
-the annual conference of the Association for Computational Linguistics (ACL), whose
-template includes the following paragraph of credits:
-\begin{quotation}
-\small % Okay to use \small inside quotation environment ONLY
-This document has been adapted from the instructions for earlier ACL
-proceedings, including those for ACL-2012 by Maggie Li and Michael
-White, those from ACL-2010 by Jing-Shing Chang and Philipp Koehn,
-those for ACL-2008 by Johanna D. Moore, Simone Teufel, James Allan,
-and Sadaoki Furui, those for ACL-2005 by Hwee Tou Ng and Kemal
-Oflazer, those for ACL-2002 by Eugene Charniak and Dekang Lin, and
-earlier ACL and EACL formats. Those versions were written by several
-people, including John Chen, Henry S. Thompson and Donald
-Walker. Additional elements were taken from the formatting
-instructions of the {\em International Joint Conference on Artificial
-  Intelligence}.
-\end{quotation}
 
-\section{VGG19}
+\section{Dataset Helper and Model Helper}
+--CHRISTIAN--
+Spiegazione delle due classi: \
+lista delle funzioni e automatizzazione
 
-In preparing the extended abstract,
-we strongly encourage using the same four section headings seen here, namely,
-Introduction, Methods, Data (or Results), and Discussion (or Conclusions).
-Use of subsections is at the authors' discretion; see Section~\ref{info-on-sections}.
+\section{First try: vanilla network}
+--NICOLA--
+-IMG della rete (dal lab) (magari orizzontale)
+risultati
+considerazioni
+\subsection{Batch Normalization}
+A first attempt was also adding a Batch Normalization + Relu Activation Layer before our Pooling layers.\
+This lead to poor result due to the fact that the network was too small.
+\subsection{Our homemade CNN}
+So deepening the CNN gave this solution much significant improvements.\\
+METTERE IMMAGINE CNN FINALE
+--- RAFFAELLO---
+
+
+\subsection{Considerations}
+Best result consideration and observations
+\section{Transfer Learning and Fine Tuning}
+We then noticed that we needed a big change on the approach to use, because the homemade
+CNN was performant, but not enough. So \textbf{we started using transfer learning and Fine tuning}
 
 \subsection{Approach: Freezing Layers}
-Extended abstracts should be no more than two pages, including references,
-in 10-point Times Roman font and two-column format, and must be submitted as pdf documents.
-The \LaTeX\ template automatically uses the {\tt newtx} package if available
-or {\tt times} if not to select Times Roman.
-Please avoid changing the font size except, if desired, in the case of an extended
-quotation as demonstrated above.
-
-Both \LaTeX\ and
-MS Word templates may be downloaded by visiting the conference website:
-\begin{center}
-\textbf{\texttt{github.com/SDSS2020/SDSS-templates}}
-\end{center}
-Margins should not be altered from those used in the template files.
-
+The \textit{modus operandi} that will be used from now is: freezing all layers while training on our augmented dataset the keras.application
+CNN, and then unlock a small amount of layers to the second phase of training (fine tuning) as near as possible to the output.
+\subsection{VGG19}
+VGG-19 is a convolutional neural network that is 19 layers deep, so we kept the freezed layers in the range of the first 8-14.\\
+Different Data Augmentations (with different seeds and augmentation parameters) were performed between the two phases,
+to even increase randomisation in the two training processes.
+\subsubsection{Results}
 \begin{table}[ht]
 \centering
 \begin{adjustbox}{width=240}
@@ -115,87 +120,59 @@ Margins should not be altered from those used in the template files.
 \label{bayespic}
 \end{center}
 \end{figure}
+\subsubsection{Considerations}
+One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
+until the pooling and not between convolutions leads to a better accuracy.
 
+\subsection{VGG16}
+--CHRISTIAN--
+Spiegazione modell + prove fatte
+\subsubsection{Results}
+\subsection{Xception}
 
-\subsection{Citations}
-
-In \LaTeX, please use the
-{\tt sdss2020} bibliography style, as demonstrated by this example document.
-MS Word users should duplicate the citation and reference section format seen here.
-
-Citations within the text appear in parentheses
-as~\cite{Nussbaum2018} or, if the author's name appears in the text
-itself, as Nussbaum~\shortcite{Nussbaum2018}.  Treat double authors as
-in~\cite{Wasserstein2016}, but write as in~\cite{Brunner} when more than two
-authors are involved. Collapse multiple citations as
-in~\cite{LaVange2019,Wasserstein2016}.  As alluded to above, full citations should not
-be used as sentence constituents.  For instance, instead of
-\begin{quote}
-  ``\cite{Arbuthnot1710} found the first $p$-value ...''
-\end{quote}
-use
-\begin{quote}
-``Arbuthnot~\shortcite{Arbuthnot1710} found the first $p$-value ...''.
-\end{quote}
-Please make references complete, presentable, and
-consistent. When using Bib\TeX, protect capital letters of names and
-abbreviations in titles, as in \{B\}ayesian or \{EM\} algorithm,
-in your .bib file.  For an example, notice that the ``FDA'' in
-the title of \cite{LaVange2019} is typed as \verb+{FDA}+ in the .bib file
-or else it would be incorrectly shown as ``fda'' in the references section.
-
-
-\subsection{Footnotes}
-
-{\bf Footnotes}: In \LaTeX, use the \verb+\footnote+
-command\footnote{This is how a footnote should appear.}. If using
-MS Word, please separate footnotes
-from the text by a line\footnote{Note the line
-separating the footnotes from the text.}.
-
-\section{Data/Results}
-
-We encourage the selective use of tables and/or figures as appropriate.
-
-\subsection{Graphics and Tables}
-
-Place figures and tables in the
-paper near where they are first discussed, rather than at the end, if
-possible.  It is acceptable that wide illustrations
-may run across both columns.  The use of color
-is allowed in extended abstract graphics.
+\subsection{Other Models}
+\subsubsection{Resnet}
+--NICOLA--
+\subsubsection{GoogleNet}
+\subsection{EfficientNet}
+--NICOLA--
 
 
 
-\subsection{Captions}
-Provide a caption below every figure and table; number each one
-sequentially in the form shown in Figure~\ref{bayespic} and
-Table~\ref{fontsizes}.
+\section{Ensemble}
+--NICOLA--
+Approccio
+provato a mischiare modelli
+          c'era bias perchè avevano seed diversi
+\subsubsection{Results}
 
-\section{Discussion/Conclusions}
 
-\subsection{Appendices and Acknowledgements}
 
-Please avoid the use of appendices and acknowledgements
-as separate sections.  Any pertinent material should be included in the
-body of the extended abstract rather than in an appendix.  If
-acknowledgements are necessary, then they should be made using footnotes.
+\section{If we had more time..}
+con più tempo cosa avremmo provato
 
-\subsection{Computer Code}
 
-If you wish to provide links to accompanying code, this is allowable because
-SDSS encourages best practices for reproducible research.  However, all
-conclusions and exposition relevant to the refereeing process should appear in
-the body of the extended abstract; furthermore, we cannot guarantee that
-code will be checked or even consulted during the refereeing process.
 
-\subsection{Refereeing Decisions}
-The review is \textbf{anonymous}. Accepted papers must be presented in person at SDSS in St. Louis
-from May 23 to 26, 2023.
-Accepted papers' authors will be notified in plenty of time to make registration and travel
-arrangements and for papers not accepted to submit a lightning abstract to the
-conference if they so choose.
 
+\section{Our Submissions}
+\begin{table}[ht]
+\centering
+\begin{adjustbox}{width=240}
+\small
+\begin{tabular}{|c|l|l|l|l|l}
+
+\hline \bf Description & \bf Result \\ \hline
+VGG19 - 10 Freezed Layers & 0.823015873 \\
+b & 0.8225 \\
+
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
+\end{table}
+%{\bf Footnotes}: Note di sotto.}.
+\section{Conclusions}
+Considerazioni finali e best model fattoo
 \bibliographystyle{sdss2020} % Please do not change the bibliography style
 \bibliography{SampleReferencesForExtendedAbstract}
 
