@@ -126,10 +126,31 @@ until the pooling and not between convolutions leads to a better accuracy.
 
 \subsection{VGG16}
 --CHRISTIAN--
-Spiegazione modell + prove fatte
+Spiegazione modell + prove fatte\\
+s\\
+s\\
+s\\
 \subsubsection{Results}
 \subsection{Xception}
-
+Xception is the evolution google proposed to their \textbf{"Inception-v3"} model, this model contain \textbf{666 layers} of \textbf{"depthwise separable convolution"}.\\
+We decided to try this model to see if this particular kind of convolution would extract better features for our model.
+Unfortunatly we couldnt find a configuration that beats our best models at the time (but performance where realy similar to vgg16)
+PUT DATA IN TABLEEEEEEEEEEE
+\begin{table}[ht]
+  \centering
+  \begin{adjustbox}{width=240}
+  \small
+  \begin{tabular}{|c|l|l|l|l|l}
+  
+  \hline \bf Freezed Layers & \bf Accuracy & \bf Precision & \bf Recall & \bf F1 \\ \hline
+  20 & 0.8169 & 0.7989 & 0.7651 & 0.763\\
+  15 & 0.8225 & 0.8181 & 0.7682 & 0.7776\\
+  20 -\> 1 & 0.8338 & 0.8161 & 0.7929 & 0.8001\\
+  \hline
+  \end{tabular}
+  \end{adjustbox}
+  \caption{Some of the best results of FineTuning using Xception}
+  \end{table}
 \subsection{Other Models}
 \subsubsection{Resnet}
 --NICOLA--
