@@ -167,12 +167,12 @@ unfortunatly the performance obtained wasnt so different from our best model at 
   \hline \bf Freezed Layers & \bf Accuracy & \bf Precision & \bf Recall & \bf F1 \\ \hline
   Transfer-Learn & 0.5734 & 0.5942 & 0.5344 & 0.5376\\
   20 & 0.6328 & 0.5903 & 0.5855 & 0.5852\\
-  15 & Lost Result & but similar &to 20 &freezed layer\\
+  15 &  &  &  & \\
   1 & 0.8136 & 0.7869 & 0.7751 & 0.7763\\
   \hline
   \end{tabular}
   \end{adjustbox}
-  \caption{Some of the best results of FineTuning using Xception}
+  \caption{Some of the best results of FineTuning using Xception. The one with 15-freezed layers has been lost. However, similar results of 20-freezed layers have been obtained (around 0.6 for all the metrics).}
   \end{table}
 \subsection{Other Models}
 In parallel to fine tuning we had tried different modify to the "home made CNN", one of them was adding skip layers to it to avoid \textbf{vanishing gradient}.\\
