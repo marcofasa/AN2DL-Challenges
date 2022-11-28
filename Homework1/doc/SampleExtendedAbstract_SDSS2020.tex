@@ -69,10 +69,9 @@ In order to ease the development of our best solution, we thought it would have 
 At the end, these helpers indeed turned out to be really helpful. Just with a line we had everything we needed. We firmly think they will turn out to be crucial also in other Deep Learning projects.
 
 \section{First try: vanilla network}
---NICOLA--
--IMG della rete (dal lab) (magari orizzontale)
-risultati
-considerazioni
+As first attempt we simply designed a basic CNN with 3 layer of Conv+Pool+Relu and a final flatten + 128 dense (and dropout)
+The initial result was pretty bad, 44\% on codalab but we managed to experiment a lot of different varietion of this network, by adding multiConv layers, BatchNormalization, multiple dense etc\dots
+We also learned a lot of what make sense and what was "excessive" and cause "vanishing gradient" like putting too much conv of same size consequently.
 \subsection{Batch Normalization}
 A first attempt was also adding a Batch Normalization + ReLu Activation Layer before our Pooling layers.\
 This lead to poor result due to the fact that the network was too small.
@@ -151,9 +150,8 @@ to even increase randomisation in the two training processes.
 One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
 until the pooling and not between convolutions leads to a better accuracy.
 
-\subsubsection{Results}
 \subsection{Xception}
-Xception is the evolution google proposed to their \textbf{"Inception-v3"} model, this model contain \textbf{131 layers} of \textbf{"depthwise separable convolution"}.\\
+Xception is the evolution google proposed to their \textbf{Inception-v3} model, this model contain \textbf{131 layers} of \textbf{depthwise separable convolution}.\\
 We decided to try this model to see if this particular kind of convolution would extract better features for our model and if this would increase Specie1 and Specie6 F1.\\
 The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling but
 unfortunatly the performance obtained wasnt so different from our best model at the time, VGG16.
@@ -179,9 +177,9 @@ In parallel to fine tuning we had tried different modify to the "home made CNN",
 We failed to implement them in a performant way, but this bring us to the next model of this FineTuning section: Resnet50-v2.\\
 We thought that maybe we were doing something wrong with skip layer, so to prove it we decided to give a try to Resnet.
 \subsubsection{Resnet}
-Unfortunatly during the various modify of the notebook we lost the cell with the saved "old performaces" and we have only the ones of the best model we get out of Resnet.\\
-We had different try on the Final Dense size and the best we could get on base model was with Flattening + Dense of 256 + Dropout 0.2
-With 
+Like for Vgg and Xception we had started by trying different dense dimension and learning rate and found that the results by changing the final dense layer wasnt changing much from 256 to 512 to 1024 so we keep the lower one for faster training.\\
+That's said we could not find satisfying results, no more than 0.7401 on local test after fine tuning.
+Maybe, with more try, would have improved it but we did not want to lose precious time on non promising models, so we moved on.
 \subsubsection{GoogleNet}
 Just to have a broad exploration and not leaving any doubt on which could be the most power pre-trained network, we decided to give a chance to GoogLeNet. At first, just for clarity, we did not analyse this network in deep and the reasons are here explained.\\[0.1cm]
 As usual, we trained the standard GoogLeNet architecture but we noticed immediately a bad behaviour: just after a bunch of epochs the model started to overfit. Besides this point, the accuracy on the validation test fluctuated abruptly passing, for instance, from 0.40 to 0.80 at each epoch. This make us a little distrustful of this network, also because we already found other more promising networks. Thus, we abandoned any further tests on this network.
@@ -195,7 +193,8 @@ The model resulted to be promising, since the simple transfer learning managed t
 We discovered that with a big number of freezed layers during fine tuning thare was no significant improvements.\\
 Those improvements come when the num of freezed layers was around 200, 100, precisely this last one was the best with an 85/86\% 
 After this, since both Resnet50 and Xception was performing well with "FULL unfreezed" we tried, for curiosity, to apply 30 more epochs with full unfreezed layers and discovered this give the model good increase on performances , precisely of 2/3 \% localy!!!
-We tried also the opposite (first full unfreezed and then 100 layer) but this was not effective,actualy it performed worst.
+So best option was:\textbf{Transfer - 100 layer run - 1 layer run} with 88\% accuracy in local and 84.9\% on Codalab.\\
+We tried also the opposite (\textbf{Transfer - 1 layer run - 100 layer run}) but this was not effective,actualy it performed worst.
 
 
 \section{Ensemble}
