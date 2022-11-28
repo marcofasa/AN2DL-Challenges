@@ -50,12 +50,8 @@ we started from our own self-made model to more sophisticated methodologies.\\
   \item Transfer Learning and Fine Tuning
   \item Ensemble method
 \end{itemize}
-Furthermore in all the attempts made, we used two classes, specifically \textbf{created to automate and support the model creation
-procedure}:
-\begin{itemize}
-  \item Dataset Helper
-  \item Model Helper
-\end{itemize}
+Furthermore in all the attempts made, we used two classes, specifically created to automate and support the model creation
+procedure: \textbf{Dataset Helper and Model Helper.}\\
 Through the continuous attempts, and support of methods in the two helper classes, we managed to find our best model and
 reach 0.8691 accuracy in the competition.
 
@@ -82,25 +78,21 @@ We combined different parameters: kernel size, number of filters, number of laye
 After some trials we noticed that we were not reaching any significant improvement (very low test scores, around 0.5/0.6 of accuracy).
 All of these trials were made with a small dataset (4000 images), but after the work done on augmentation (\ref{subsec:augmentation}) the same model performed much better reaching 0.80/0.85 on test set.
 We noticed though the model was not much reliable since on Codalab it performed around 0.78.
-
+We attach to this report an image of this architecture.
 
 \subsection{Augmentation}\label{subsec:augmentation}
 Since vanilla networks were not providing good results we decided to focus on data.
-First of all we decided to generate a number of images so that the ratio $images_{specie_i}/tot_{images}$ was almost the same for each specie $i=1,\dots,8$.
+First of all we decided to generate a number of images so that the ratio $images_{specie_i}/tot_{images}$ was almost the same for each species $i=1,\dots,8$.
 then we started exploiting all the functionalities of \textbf{ImageDataGenerator} in order to generate as much images as possible so that the network could extract them without overfitting.
-By doing this we started reaching higher accuracies deduced that the image dataset should not be smaller then 10k images.
+By doing this we started reaching higher accuracies, deducing that the image dataset should not be smaller then 10k images.
 With further search we noticed smaller -- but significant -- improvements until 25k images.
 After that we decided to improve the generalization ability of the network by augmenting the images with \textbf{CutMix}, \textbf{MixUp}, \textbf{GridMask} and \textbf{Grayscale}.
 This turned out to be another small but significant improvement on the accuracy, reaching 3/4 percentage points on test accuracy, depending also on the model used.
 
 
-
-\subsection{Considerations}
-Best result consideration and observations \\
-Commento da Christian: qui specifichiamo l'importanza della augmentation e che abbiamo pensato potesse risolvere il problema della bassa accuracy (infatti alla fine è megliorato) + che poi abbiamo espanso con cut-out e cut-mix -- magari dire brevemente il perché, secondo noi, con augmentation/cutout è migliorato.
 \section{Transfer Learning and Fine Tuning}
 We then noticed that we needed a big change on the approach to use, because the homemade
-CNN was performant, but not enough. So \textbf{we started using transfer learning and Fine tuning}
+CNN was performant, but not enough. So \textbf{we started using transfer learning and Fine tuning.}
 
 \subsection{Approach: Freezing Layers}
 The \textit{modus operandi} that will be used from now is: freezing all layers while training on our augmented dataset the keras.application
@@ -155,23 +147,15 @@ to even increase randomisation in the two training processes.
 \label{vgg19_results}
 \end{table}
 
-
-\begin{figure}[ht]
-\begin{center}
-\centerline{\includegraphics[width=\columnwidth]{VGG19_best}}
-\caption{Confusion Matrix of best configuration with VGG19.}
-\label{bayespic}
-\end{center}
-\end{figure}
 \subsubsection{Considerations}
 One of the most particular observation that we can made after experimenting the first attempts of freezing, is that freezing the net
 until the pooling and not between convolutions leads to a better accuracy.
 
 \subsection{Xception}
-Xception is the evolution google proposed to their \textbf{Inception-v3} model, this model contain \textbf{131 layers} of \textbf{depthwise separable convolution}.\\
+Xception is the evolution that Google proposed to their \textbf{Inception-v3} model, this model contain \textbf{131 layers} of \textbf{depthwise separable convolution}.\\
 We decided to try this model to see if this particular kind of convolution would extract better features for our model and if this would increase Specie1 and Specie6 F1.\\
-The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling but
-unfortunatly the performance obtained wasnt so different from our best model at the time, VGG16.
+The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling.\\
+However, unfortunately, the performance obtained was not so different from our best model at the time, VGG16.
 
 \begin{table}[ht]
   \centering
@@ -180,38 +164,38 @@ unfortunatly the performance obtained wasnt so different from our best model at 
   \begin{tabular}{|c|l|l|l|l|l}
   
   \hline \bf Freezed Layers & \bf Accuracy & \bf Precision & \bf Recall & \bf F1 \\ \hline
-  Transfer-Learn & 0.5734 & 0.5942 & 0.5344 & 0.5376\\
+  No Tuning& 0.5734 & 0.5942 & 0.5344 & 0.5376\\
   20 & 0.6328 & 0.5903 & 0.5855 & 0.5852\\
-  15 &  &  &  & \\
   1 & 0.8136 & 0.7869 & 0.7751 & 0.7763\\
   \hline
   \end{tabular}
   \end{adjustbox}
-  \caption{Some of the best results of FineTuning using Xception. The one with 15-freezed layers has been lost. However, similar results of 20-freezed layers have been obtained (around 0.6 for all the metrics).}
+  \caption{Some of the best results of FineTuning using Xception.(Other test were done but with similar results).}
   \end{table}
 \subsection{Other Models}
-In parallel to fine tuning we had tried different modify to the "home made CNN", one of them was adding skip layers to it to avoid \textbf{vanishing gradient}.\\
+In parallel to fine tuning we had tried to apply some changes to the "home made CNN", one of them was to add skip layers to it to avoid \textbf{vanishing gradient}.\\
 We failed to implement them in a performant way, but this bring us to the next model of this FineTuning section: Resnet50-v2.\\
 We thought that maybe we were doing something wrong with skip layer, so to prove it we decided to give a try to Resnet.
 \subsubsection{Resnet}
-Like for Vgg and Xception we had started by trying different dense dimension and learning rate and found that the results by changing the final dense layer wasnt changing much from 256 to 512 to 1024 so we keep the lower one for faster training.\\
+Like for Vgg and Xception we had started by trying different dense dimension and learning rate and found that the results by changing the final dense layer was not changing much from 256 to 512 to 1024 so we keep the lower one for faster training.\\
 That's said we could not find satisfying results, no more than 0.7401 on local test after fine tuning.
-Maybe, with more try, would have improved it but we did not want to lose precious time on non promising models, so we moved on.
+Maybe, with more trials, would have improved it but we did not want to lose precious time on non promising models, so we moved on.
 \subsubsection{GoogleNet}
 Just to have a broad exploration and not leaving any doubt on which could be the most power pre-trained network, we decided to give a chance to GoogLeNet. At first, just for clarity, we did not analyse this network in deep and the reasons are here explained.\\[0.1cm]
 As usual, we trained the standard GoogLeNet architecture but we noticed immediately a bad behaviour: just after a bunch of epochs the model started to overfit. Besides this point, the accuracy on the validation test fluctuated abruptly passing, for instance, from 0.40 to 0.80 at each epoch. This make us a little distrustful of this network, also because we already found other more promising networks. Thus, we abandoned any further tests on this network.
 \subsection{EfficientNet}
-As last option we decided to give a try to one of the "BIG" models on keras.application;
-Initialy we were discoraged by the huge number of parameter (on colab we hadn't managed to load it due to ram issue for example)
+As last option we decided to give a try to one of the "BIG" models on keras.application.
+Initially we were discouraged by the huge number of parameter (on colab we hadn't managed to load it due to ram issue for example)
 but we wanted to give it a try since it's architecture was different from already tried models, and on keras.application was the best on TOP1 accuracy.\\
 As already said, it was a little hard to work with this model given our resources so we used an approach not 100\% correct.
 Thats said, to select the best hyperparameter we started to train only few epochs and keep running ONLY if it was promising (probably not the best approach).\\
-The model resulted to be promising, since the simple transfer learning managed to get 71\% of accuracy localy, and then we started experimenting fine tuning.\\
+The model resulted to be promising, since the simple transfer learning managed to get 71\% of accuracy locally, and then we started experimenting fine tuning.\\
 We discovered that with a big number of freezed layers during fine tuning thare was no significant improvements.\\
-Those improvements come when the num of freezed layers was around 200, 100, precisely this last one was the best with an 85/86\% 
-After this, since both Resnet50 and Xception was performing well with "FULL unfreezed" we tried, for curiosity, to apply 30 more epochs with full unfreezed layers and discovered this give the model good increase on performances , precisely of 2/3 \% localy!!!
-So best option was:\textbf{Transfer - 100 layer run - 1 layer run} with 88\% accuracy in local and 84.9\% on Codalab.\\
-We tried also the opposite (\textbf{Transfer - 1 layer run - 100 layer run}) but this was not effective,actualy it performed worst.
+Those improvements come when the number of freezed layers was between 200 and 100. Precisely this last one was the best with an 85/86\% 
+After this, since both Resnet50 and Xception was performing well with "FULL unfreezed", we tried, for curiosity, to apply 30 more epochs with full unfreezed layers and discovered this increased model performances of 2/3 \% locally.
+So, best option was: \textbf{Transfer - 100 layer run - 1 layer run} with 88\% accuracy in local and 84.9\% on Codalab.\\
+We tried also the opposite (\textbf{Transfer - 1 layer run - 100 layer run}) but this was not effective, actually it performed worst.
+
 
 
 \section{Ensemble}
@@ -219,50 +203,24 @@ The ensemble techniques consist into combining multiple models together to creat
 The idea behind is that we can take our best models, and apply a majority voting on the predicted species.
 This will grant more robustness, since wrong choice come from majority of models predicting wrong species.
 
-The improvement was as expected, pretty high, but localy we get a "biased" result since the EfficientNet was trained using a different random seed so different test/train split.. and was too late to retrain such a huge model.
-so we will use CodaLab accuracy as metrics here:
+The improvement was as expected, pretty high, but locally we get a "biased" result since the EfficientNet was trained using a different random seed so different test/train split. Moreover, was too late to retrain such a huge model.
+Thus we will use CodaLab accuracy as metrics here:
 \begin{itemize}
   \item \textbf{Development Phase:} 87.89\%
-  \item \textbf{Filan Phase:} 86.91\%
+  \item \textbf{Final Phase:} 86.91\%
 \end{itemize}
 
-This ensemble combine together our best 7: Xception, Vgg16, Vgg19, Resnet, EfficientNet, HomeMade good, and First Homemade.
+This ensemble combine together our best 7 models: Xception, VGG(both), Resnet, EfficientNet, HomeMade good, and First Homemade.
 
 \subsubsection{Better approach}
-At this moment the time was end, and we couldn't do more test but a thing we would have wanted to do was apply ensemble with some more "intelligently" chosen models.
-Eg: chose models with a particular confusion matrix so to maximize the concept of majority voting
-An example was chosing some models that work well on certain species to avoid false positive/false negative on that species.
+At this moment the time was end, and we could not do more tests but a thing we would have wanted to do was to apply ensemble with some more "intelligently" chosen models.
+Eg: choose models with a particular confusion matrix so to maximize the concept of majority voting, as cnn that work well on certain species to avoid false positive/false negative on that species.
 
-
-
-\section{Further developments}
-No need to say: time was our enemy during the development phase. Moreover, we used as platform Google Colab, which did not make things easier since -- legitimately -- after some time blocked our permission to use their GPUs.\\[0.1cm]
-Nevertheless, if we had more time...
-
-
-
-\section{Our Submissions}
-\begin{table}[ht]
-\centering
-\begin{adjustbox}{width=240}
-\small
-\begin{tabular}{|c|l|l|l|l|l}
-
-\hline \bf Model & \bf Details & \bf Result \\ \hline
-HM_{CNN} & 8 Layers & ???? \\
-VGG16   & 8 Freezed Layers & 0.8325 \\
-VGG19   & 10 Freezed Layers & 0.8230 \\
-EfficientNet   & 100 Freezed Layers & 0.8390 \\
-EfficientNet   & 100 Freezed Layers  Run + 1 Freezed Layer Run & 0.8490 \\
-Ensemble & 7 Best Model Majority Voting & 0.8780 \\
-\hline
-\end{tabular}
-\end{adjustbox}
-\caption{Our best models submitted in Codalab.}
-\end{table}
 %{\bf Footnotes}: Note di sotto.}.
 \section{Conclusions}
-Considerazioni finali e best model fattoo
+The best technique was Ensemble that grant us the best result.
+Initially, we did not feel like this was the best way but when our models get stucked in a plateau of accuracy
+we decided to try it because we thought that put our best models together would have covered each other weaknesses.
 \bibliographystyle{sdss2020} % Please do not change the bibliography style
 \bibliography{SampleReferencesForExtendedAbstract}
 
