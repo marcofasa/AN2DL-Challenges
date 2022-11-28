@@ -26,7 +26,7 @@ Homework 1}
     {\tt raffaello.fornasiere \\
     \tt @mail.polimi.it} \\\And
   Christian Spano \\
-  10617541 \\
+  10823764 \\
   {\tt christian.spano \\
   \tt @mail.polimi.it} \\}
 
@@ -61,12 +61,12 @@ reach 0.8691 accuracy in the competition.
 
 
 \section{Dataset Helper and Model Helper}
-In order to ease the development of our best solution, we thought it would have been useful to create two ad-hoc helper libraries. As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy). In particular, what we did was to create two helpers:
+In order to ease the development of our best solution, we thought it would have been useful to create two ad-hoc helpers. As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy). In particular, what we did was to create two helpers:
 \begin{itemize}
     \item \textbf{Dataset helper}: for dealing with everything related to the dataset; for instance (just for mentioning the most relevant functions) we created functions to perform \textit{augmentation} and \textit{cut-out/cut-mix} of the dataset. Other functions were intended for processing data (e.g., normalization)
     \item \textbf{Model helper}: for dealing with everything related to the models; this helper was intended for easing the construction of models. For instance, we create some functions for plotting insightful graphs (e.g., confusion matrix, residuals, predictions, etc.) and some other functions for managing the models (e.g., save the model in a specified directory or create checkpoints during training)
 \end{itemize}
-At the end, these helpers indeed turned out to be really helpful. Just with a line we had everything we needed. 
+At the end, these helpers indeed turned out to be really helpful. Just with a line we had everything we needed. We firmly think they will turn out to be crucial also in other Deep Learning projects.
 
 \section{First try: vanilla network}
 --NICOLA--
@@ -74,24 +74,24 @@ At the end, these helpers indeed turned out to be really helpful. Just with a li
 risultati
 considerazioni
 \subsection{Batch Normalization}
-A first attempt was also adding a Batch Normalization + Relu Activation Layer before our Pooling layers.\
+A first attempt was also adding a Batch Normalization + ReLu Activation Layer before our Pooling layers.\
 This lead to poor result due to the fact that the network was too small.
 
 \subsection{Our homemade CNN}
-After some attempts on small vanilla networks with poor results we've tried to improve the network by adding some more layers with more filters.
+After some attempts on small vanilla networks with poor results we tried to improve the network by adding some more layers with more filters.
 We combined different parameters: kernel size, number of filters, number of layers, units of the dense layers.
-After some trials we noticed that we weren't reaching any significant improvement (very low test scores, around 0.5/06 of accuracy).
+After some trials we noticed that we were not reaching any significant improvement (very low test scores, around 0.5/0.6 of accuracy).
 All of these trials were made with a small dataset (4000 images), but after the work done on augmentation (\ref{subsec:augmentation}) the same model performed much better reaching 0.80/0.85 on test set.
-We noticed though the model wasn't much reliable since on codalab it performed around 0,78.
+We noticed though the model was not much reliable since on Codalab it performed around 0.78.
 
 
 \subsection{Augmentation}\label{subsec:augmentation}
-Since vanilla networks weren't providing good results we decided to focus on data.
-First of all we decided to generate a number of images so that the ratio $images_{specie_i}/tot_{images}$ was almost the same for each specie $i$.
-then we started exploiting all the functionalities of ImageDataGenerator in order to generate as much images as possible so that the network could extract them without overfitting.
-By doing this we started reaching higher accuracies deduced that the image dataset shouldn't be smaller then 10k images.
-With further search we noticed smaller - but significant - improvements until 25k images.
-After that we decided to improve the generalization ability of the network by augmenting the images with CutMix, MixUp, GridMask and Grayscale.
+Since vanilla networks were not providing good results we decided to focus on data.
+First of all we decided to generate a number of images so that the ratio $images_{specie_i}/tot_{images}$ was almost the same for each specie $i=1,\dots,8$.
+then we started exploiting all the functionalities of \textbf{ImageDataGenerator} in order to generate as much images as possible so that the network could extract them without overfitting.
+By doing this we started reaching higher accuracies deduced that the image dataset should not be smaller then 10k images.
+With further search we noticed smaller -- but significant -- improvements until 25k images.
+After that we decided to improve the generalization ability of the network by augmenting the images with \textbf{CutMix}, \textbf{MixUp}, \textbf{GridMask} and \textbf{Grayscale}.
 This turned out to be another small but significant improvement on the accuracy, reaching 3/4 percentage points on test accuracy, depending also on the model used.
 
 
@@ -107,13 +107,14 @@ CNN was performant, but not enough. So \textbf{we started using transfer learnin
 The \textit{modus operandi} that will be used from now is: freezing all layers while training on our augmented dataset the keras.application
 CNN, and then unlock a small amount of layers to the second phase of training (fine tuning) as near as possible to the output.
 \subsection{VGG16}
-The first network we decided to utilize with this approach was VGG16. We started from this network mainly because, generally speaking, it has given great results in many different Deep Learning tasks; so, we thought it was a good network to start with. Indeed, at the end, it did not deceive us. More in details, at the very first we trained this network neither applying augmentation nor fine-tuning. However, as expected, we got poor results (an accuracy of about $60\%$). Applying data-augmentation, the accuracy risen up to roughly $70\%$, that is an improvement in accuracy of $10\%$.\\
+The first network we decided to utilize with this approach was VGG16. We started from this network mainly because, generally speaking, it has given great results in many different Deep Learning tasks; so, we thought it was a good network to start with. Indeed, at the end, it did not deceive us.\\[0.1cm] More in details, at the very first we trained this network neither applying augmentation nor fine-tuning. By the way, the network architecture was equal to the standard VGG16 one, with 256 neurons in the Dense Layer at the top. However, as expected, we got poor results (an accuracy of about $60\%$). Applying data-augmentation, the accuracy risen up to roughly $70\%$, that is an improvement in accuracy of $10\%$.\\[0.1cm]
 At this point, to boost up even more the accuracy, we decided to do fine-tuning treating the number of freezed layer as an hyperparameter to be learned. Indeed, we trained the network with $k$ freezed layers and we pick up the one such that
 \begin{equation*}
     k^* = \underset{k}{\operatorname{argmax}}\{test\_accuracy_{k}\}
 \end{equation*}
-TO BE CONTINUED...
 \subsubsection{Results}
+The best number of freezed layers turned out to be $k=8$. Setting this parameter to this 'optimal' value, we got a test accuracy of nearly $0.85$, against $0.8325$ on Codalab. This has been our first best result. That's why further tests have been done. For instance, we tried to change the number of neurons, add more Dense Layers, and change some parameters of the augmentation but all these tests failed since they made the test-accuracy dropping down.\\[0.1cm]
+The only test that passed successfully -- even though with very little improvement -- was to apply the more advanced augmentation we mentioned in subsection 3.3. As a matter of fact, this improved dramatically the test accuracy boosting it up to roughly 0.94. However, it provided very little improvement on Codalab, i.e., an accuracy of 0.8381. No other best results have been received with this network and since we were stuck with these results, we thought it was reasonable to explore other pre-trained networks.
 \subsection{VGG19}
 VGG-19 is a convolutional neural network that is 19 layers deep, so we kept the freezed layers in the range of the first 8-14.\\
 Different Data Augmentations (with different seeds and augmentation parameters) were performed between the two phases,
@@ -156,6 +157,8 @@ until the pooling and not between convolutions leads to a better accuracy.
 \subsubsection{Resnet}
 --NICOLA--
 \subsubsection{GoogleNet}
+Just to have a broad exploration and not leaving any doubt on which could be the most power pre-trained network, we decided to give a chance to GoogLeNet. At first, just for clarity, we did not analyse this network in deep and the reasons are here explained.\\[0.1cm]
+As usual, we trained the standard GoogLeNet architecture but we noticed immediately a bad behaviour: just after a bunch of epochs the model started to overfit. Besides this point, the accuracy on the validation test fluctuated abruptly passing, for instance, from 0.40 to 0.80 at each epoch. This make us a little distrustful of this network, also because we already found other more promising networks. Thus, we abandoned any further tests on this network.
 \subsection{EfficientNet}
 --NICOLA--
 
@@ -170,9 +173,9 @@ provato a mischiare modelli
 
 
 
-\section{If we had more time..}
-con più tempo cosa avremmo provato
-
+\section{Further developments}
+No need to say: time was our enemy during the development phase. Moreover, we used as platform Google Colab, which did not make things easier since -- legitimately -- after some time blocked our permission to use their GPUs.\\[0.1cm]
+Nevertheless, if we had more time...
 
 
 
@@ -189,7 +192,7 @@ VGG19 & 10 Freezed Layers & 0.8230 \\
 \hline
 \end{tabular}
 \end{adjustbox}
-\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
+\caption{Our best submission -- one for each member of the team.}
 \end{table}
 %{\bf Footnotes}: Note di sotto.}.
 \section{Conclusions}
