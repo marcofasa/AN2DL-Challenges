@@ -70,7 +70,7 @@ At the end, these helpers indeed turned out to be really helpful. Just with a li
 
 \section{First try: vanilla network}
 As first attempt we simply designed a basic CNN with 3 layer of Conv+Pool+Relu and a final flatten + 128 dense (and dropout)
-The initial result was pretty bad, 44\% on codalab but we managed to experiment a lot of different varietion of this network, by adding multiConv layers, BatchNormalization, multiple dense etc\dots
+The initial result was pretty bad, 44\% on codalab but we managed to experiment a lot of different varietion of this network, by adding multiConv layers, BatchNormalization, multiple dense etc.
 We also learned a lot of what make sense and what was "excessive" and cause "vanishing gradient" like putting too much conv of same size consequently.
 \subsection{Batch Normalization}
 A first attempt was also adding a Batch Normalization + ReLu Activation Layer before our Pooling layers.\
@@ -112,8 +112,24 @@ At this point, to boost up even more the accuracy, we decided to do fine-tuning 
     k^* = \underset{k}{\operatorname{argmax}}\{test\_accuracy_{k}\}
 \end{equation*}
 \subsubsection{Results}
-The best number of freezed layers turned out to be $k=8$. Setting this parameter to this 'optimal' value, we got a test accuracy of nearly $0.85$, against $0.8325$ on Codalab. This has been our first best result. That's why further tests have been done. For instance, we tried to change the number of neurons, add more Dense Layers, and change some parameters of the augmentation but all these tests failed since they made the test-accuracy dropping down.\\[0.1cm]
+The best number of freezed layers turned out to be $k=8$. All the results based on $k$ are reported in table \ref{vgg16_results}. Setting this parameter to this 'optimal' value, we got a test accuracy of $0.8249$, against $0.8325$ on Codalab. This has been our first best result. That's why further tests have been done. For instance, we tried to change the number of neurons, add more Dense Layers, and change some parameters of the augmentation but all these tests failed since they made the test-accuracy dropping down.\\[0.1cm]
 The only test that passed successfully -- even though with very little improvement -- was to apply the more advanced augmentation we mentioned in subsection 3.3. As a matter of fact, this improved dramatically the test accuracy boosting it up to roughly 0.94. However, it provided very little improvement on Codalab, i.e., an accuracy of 0.8381. No other best results have been received with this network and since we were stuck with these results, we thought it was reasonable to explore other pre-trained networks.
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{|c|c|}
+
+\hline \bf Freezed Layers & \bf Test accuracy \\ \hline
+6 & 0.7881 \\
+8 & 0.8249 \\
+10 & 0.8051 \\
+12 & 0.7994 \\
+
+\hline
+\end{tabular}
+\caption{Results with Transfer Learning and number of freezed-layers for VGG16.}
+\label{vgg16_results}
+\end{table}
 \subsection{VGG19}
 VGG-19 is a convolutional neural network that is 19 layers deep, so we kept the freezed layers in the range of the first 8-14.\\
 Different Data Augmentations (with different seeds and augmentation parameters) were performed between the two phases,
@@ -135,7 +151,8 @@ to even increase randomisation in the two training processes.
 \hline
 \end{tabular}
 \end{adjustbox}
-\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
+\caption{Results with Transfer Learning and number of freezed-layers for VGG19.}
+\label{vgg19_results}
 \end{table}
 
 
@@ -241,7 +258,7 @@ Ensemble & 7 Best Model Majority Voting & 0.8780 \\
 \hline
 \end{tabular}
 \end{adjustbox}
-\caption{Results with Transfer Learning and Number of freezed layers for VGG19.}
+\caption{Our best models submitted in Codalab.}
 \end{table}
 %{\bf Footnotes}: Note di sotto.}.
 \section{Conclusions}
