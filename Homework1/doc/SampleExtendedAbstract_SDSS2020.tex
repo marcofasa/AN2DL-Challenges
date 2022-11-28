@@ -1,5 +1,5 @@
 % File SDSS2020_SampleExtendedAbstract.tex
-\documentclass[10pt]{article}
+\documentclass[11pt]{article}
 \usepackage{sdss2020} % Uses Times Roman font (either newtx or times package)
 \usepackage{url}
 \usepackage{latexsym}
@@ -7,6 +7,8 @@
 \usepackage{algorithm, algorithmic}
 \usepackage{graphicx}
 \usepackage{adjustbox}
+\usepackage{setspace}
+\setstretch{0.85}
 \graphicspath{{images/}}
 
 \title{Artificial Neural Networks and Deep Learning \\
@@ -27,7 +29,7 @@ Homework 1}
     \tt @mail.polimi.it} \\\And
   Christian Spano \\
   10823764 \\
-  {\tt christian.spano \\
+  {\tt christian.spano \\200
   \tt @mail.polimi.it} \\}
 
 
@@ -44,12 +46,7 @@ Homework 1}
 \section{Introduction}
 In order to touch all the important aspects of the procedure of finding the best solution to this classification problem,
 we started from our own self-made model to more sophisticated methodologies.\\
- We can summarize our approaches in:
-\begin{itemize}
-  \item Vanilla network
-  \item Transfer Learning and Fine Tuning
-  \item Ensemble method
-\end{itemize}
+ We can summarize our approaches in: Vanilla network, Transfer Learning, Fine Tuning, Ensemble.\\
 Furthermore in all the attempts made, we used two classes, specifically created to automate and support the model creation
 procedure: \textbf{Dataset Helper and Model Helper.}\\
 Through the continuous attempts, and support of methods in the two helper classes, we managed to find our best model and
@@ -107,8 +104,9 @@ At this point, to boost up even more the accuracy, we decided to do fine-tuning 
 The best number of freezed layers turned out to be $k=8$. All the results based on $k$ are reported in table \ref{vgg16_results}. Setting this parameter to this 'optimal' value, we got a test accuracy of $0.8249$, against $0.8325$ on Codalab. This has been our first best result. That's why further tests have been done. For instance, we tried to change the number of neurons, add more Dense Layers, and change some parameters of the augmentation but all these tests failed since they made the test-accuracy dropping down.\\[0.1cm]
 The only test that passed successfully -- even though with very little improvement -- was to apply the more advanced augmentation we mentioned in subsection 3.3. As a matter of fact, this improved dramatically the test accuracy boosting it up to roughly 0.94. However, it provided very little improvement on Codalab, i.e., an accuracy of 0.8381. No other best results have been received with this network and since we were stuck with these results, we thought it was reasonable to explore other pre-trained networks.
 \begin{table}[ht]
-\centering
-\small
+  \centering
+  \begin{adjustbox}{width=150}
+  \small
 \begin{tabular}{|c|c|}
 
 \hline \bf Freezed Layers & \bf Test accuracy \\ \hline
@@ -119,6 +117,7 @@ The only test that passed successfully -- even though with very little improveme
 
 \hline
 \end{tabular}
+\end{adjustbox}
 \caption{Results with Transfer Learning and number of freezed-layers for VGG16.}
 \label{vgg16_results}
 \end{table}
@@ -129,7 +128,7 @@ to even increase randomisation in the two training processes.
 \subsubsection{Results}
 \begin{table}[ht]
 \centering
-\begin{adjustbox}{width=240}
+\begin{adjustbox}{width=200}
 \small
 \begin{tabular}{|c|l|l|l|l|l}
 
@@ -154,12 +153,12 @@ until the pooling and not between convolutions leads to a better accuracy.
 \subsection{Xception}
 Xception is the evolution that Google proposed to their \textbf{Inception-v3} model, this model contain \textbf{131 layers} of \textbf{depthwise separable convolution}.\\
 We decided to try this model to see if this particular kind of convolution would extract better features for our model and if this would increase Specie1 and Specie6 F1.\\
-The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling.\\
+The best result was given, surprisingly, by unlocking the full network and using a dense of 256 with global avg pooling.
 However, unfortunately, the performance obtained was not so different from our best model at the time, VGG16.
 
 \begin{table}[ht]
   \centering
-  \begin{adjustbox}{width=240}
+  \begin{adjustbox}{width=200}
   \small
   \begin{tabular}{|c|l|l|l|l|l}
   
@@ -189,7 +188,7 @@ Initially we were discouraged by the huge number of parameter (on colab we hadn'
 but we wanted to give it a try since it's architecture was different from already tried models, and on keras.application was the best on TOP1 accuracy.\\
 As already said, it was a little hard to work with this model given our resources so we used an approach not 100\% correct.
 Thats said, to select the best hyperparameter we started to train only few epochs and keep running ONLY if it was promising (probably not the best approach).\\
-The model resulted to be promising, since the simple transfer learning managed to get 71\% of accuracy locally, and then we started experimenting fine tuning.\\
+The model resulted to be promising, since the simple transfer learning managed to get 71\% of accuracy locally, and then we started experimenting fine tuning.
 We discovered that with a big number of freezed layers during fine tuning thare was no significant improvements.\\
 Those improvements come when the number of freezed layers was between 200 and 100. Precisely this last one was the best with an 85/86\% 
 After this, since both Resnet50 and Xception was performing well with "FULL unfreezed", we tried, for curiosity, to apply 30 more epochs with full unfreezed layers and discovered this increased model performances of 2/3 \% locally.
@@ -204,11 +203,8 @@ The idea behind is that we can take our best models, and apply a majority voting
 This will grant more robustness, since wrong choice come from majority of models predicting wrong species.
 
 The improvement was as expected, pretty high, but locally we get a "biased" result since the EfficientNet was trained using a different random seed so different test/train split. Moreover, was too late to retrain such a huge model.
-Thus we will use CodaLab accuracy as metrics here:
-\begin{itemize}
-  \item \textbf{Development Phase:} 87.89\%
-  \item \textbf{Final Phase:} 86.91\%
-\end{itemize}
+Thus we will use CodaLab accuracy as metrics,
+\textbf{Development Phase:} 87.89\% and \textbf{Final Phase:} 86.91\%.
 
 This ensemble combine together our best 7 models: Xception, VGG(both), Resnet, EfficientNet, HomeMade good, and First Homemade.
 
