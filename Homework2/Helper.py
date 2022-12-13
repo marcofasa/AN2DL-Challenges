@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import tsaug
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
+from tsaug import *
 
 training_labels = {
     "Wish": 0,
@@ -208,3 +210,61 @@ def confusionmatr_and_metrics(model, X_test, y_test, label_mapping):
     plt.xlabel('True labels')
     plt.ylabel('Predicted labels')
     plt.show()
+
+
+def plot_aug(x, x_aug):
+    # color red for original and green for augmented
+    plt.plot(x, color='red')
+    plt.plot(x_aug, color='green')
+
+def data_smoothing(data, window_size=10):
+    '''
+        Apply a moving average to the data.
+    '''
+    return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
+
+def random_cropping(x, y, crop_size=100):
+    '''
+        Randomly crop the data.
+    '''
+    start = np.random.randint(0, x.shape[0]-crop_size)
+    end = start + crop_size
+    return x[start:end], y[start:end]
+
+# Random Rotation: Rotate the data series to create new data points.
+def random_rotation(x, y, max_rotation=10):
+    '''
+        Randomly rotate the data.
+    '''
+    rotation = np.random.randint(-max_rotation, max_rotation)
+    return rotate(x, rotation), y
+
+
+# Random Flipping: Flip the data series horizontally or vertically to create new data points.
+def random_flipping(x, y, max_flip=1):
+    '''
+        Randomly flip the data.
+    '''
+    flip = np.random.randint(-max_flip, max_flip)
+    return np.flip(x, axis=flip), y
+
+# Random Scaling: Scale the data series up or down to create new data points.
+def random_scaling(x, y, max_scale=1.5):
+    '''
+        Randomly scale the data.
+    '''
+    scale = np.random.uniform(1, max_scale)
+    return scale*x, y
+
+
+def apply_aug_function(x, y, aug_function, dim=100, **kwargs):
+    '''
+        generate new dim data series by taking random dataseries in x and applying aug_function
+    '''
+    x_aug = np.zeros((dim, x.shape[1]))
+    y_aug = np.zeros((dim, y.shape[1]))
+    for i in range(dim):
+        idx = np.random.randint(0, x.shape[0])
+        x_aug[i], y_aug[i] = aug_function(x[idx], y[idx], **kwargs)
+    return x_aug, y_aug
+
