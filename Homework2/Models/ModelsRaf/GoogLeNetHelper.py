@@ -1,7 +1,5 @@
-
-
 def build_GoogLeNet_model(inputShape, nClasses, learningRate=0.001, momentum=0.9, loss="categorical_crossentropy",
-                        metrics=["accuracy"]):
+                          metrics=["accuracy"]):
     """
     Builds a GoogLeNet model for data series with Conv1D.
     """
@@ -79,3 +77,61 @@ def Inception1D(filters, strides=1, padding="same"):
         return x
 
     return inception
+
+
+# build a network to classify data series with Conv1D
+def build_4_layers_conv1d_network(input_shape, classes, learning_rate=0.001, momentum=0.9,
+                                  loss="categorical_crossentropy",
+                                  metrics=["accuracy"]):
+    """
+    Builds 4 layers Conv1D network for data series.
+    """
+    # Define the model input
+    input = Input(shape=input_shape)
+
+    # Apply convolutional layers
+    x = Conv1D(filters=32, kernel_size=7, strides=1, padding="same")(input)
+    x = Activation("relu")(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=2)(x)
+
+    x = Conv1D(filters=64, kernel_size=5, strides=1, padding="same")(x)
+    x = Activation("relu")(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=2)(x)
+
+    x = Conv1D(filters=128, kernel_size=3, strides=1, padding="same")(x)
+    x = Activation("relu")(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=2)(x)
+
+    x = Conv1D(filters=256, kernel_size=3, strides=1, padding="same")(x)
+    x = Activation("relu")(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=2)(x)
+
+    # apply convolutional layers with sigmoid activation
+    x = Conv1D(filters=256, kernel_size=3, strides=1, padding="same")(x)
+    x = Activation("sigmoid")(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=2)(x)
+
+    # Apply a dense layer
+    x = Flatten()(x)
+    x = Dense(units=classes)(x)
+
+    # Apply global pooling
+    x = GlobalAveragePooling1D()(x)
+
+    # Add a fully connected layer
+    x = Dense(units=classes)(x)
+    x = Activation("softmax")(x)
+
+    # Define the model
+    model = Model(inputs=input, outputs=x)
+
+    # Compile the model
+    model.compile(optimizer=SGD(learning_rate=learning_rate, momentum=momentum), loss=loss, metrics=metrics)
+
+    return model
+
