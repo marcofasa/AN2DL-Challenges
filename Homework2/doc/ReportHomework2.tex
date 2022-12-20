@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{setspace}
-\setstretch{0.85}
+\setstretch{0.9}
 \graphicspath{{images/}}
 
 \title{Artificial Neural Networks and Deep Learning \\
@@ -44,25 +44,6 @@ Homework 2}
 
 CHRISTIAN + MARCO
 TIME SERIES MARCO
-\begin{table}[h]
-\begin{center}
-\begin{tabular}{|l|rl|}
-\hline \bf Type of Text & \bf Font Size & \bf Style \\ \hline
-paper title & 15 pt & bold \\
-author names & 12 pt & bold \\
-author affiliation & 12 pt & \\
-the word ``Abstract'' & 12 pt & bold \\
-section titles & 12 pt & bold \\
-document text & 10 pt  &\\
-captions & 10 pt & \\
-abstract text & 10 pt & \\
-bibliography & 10 pt & \\
-footnotes & 9 pt & \\
-\hline
-\end{tabular}
-\end{center}
-\caption{\label{fontsizes} Sizes and styles of fonts used.}
-\end{table}
 
 %What are time series??
 %How to deal with them in short
@@ -86,7 +67,7 @@ As first approach, we normalized the dataset by \textbf{FULL columns}
 The next method we tried, was to normalize each sample (TimeSerie) independently, to completly remove the different scales of the targets.
 \begin{itemize}
   \item \textbf{MinMax} Improve performances but not enough, at least on vanilla models
-  \item \textbf{Mean / Std} This was the \textbf{Game Changer} for us, it improves the performances on Vanilla models from 63\% to 67\%
+  \item \textbf{Mean / Std} This was the \textbf{Game Changer} for us, it improves the performances on Vanilla models from 63\% to 67\% on the Vanilla BiLstm
 \end{itemize}
 \subsection{Augmentation}
 In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
@@ -100,7 +81,7 @@ To obtain augmented samples we copied the dataset multiple time, and then, for e
   \caption{With x be a single time series, w be a weight of our choice}
 \end{figure}
 
-The result of augmantation was immediate and bring us a solid 68\% using the vanilla BiLstm
+The result of augmantation was immediate and bring us a solid 68\% using the vanilla BiLstm (that was performing only 67\% without augmentation)
 \subsubsection{TSUNG/Librery}
 %Per raffaello, cambia il nome del titoletto come vuoi
  RAFFAELLO
@@ -112,43 +93,60 @@ Christian
 \section{Vanilla Models}
 MARCO
 \section{Net Concatenations}
-\subsection{LSTM + CNN}
+Now that our Preprocessing was giving promising results and the possible changes to vanilla models was not giving results better than 68.0\%
+we decided to try combining LSTM and CNN into a single network.
 \subsection{CNN + LSTM}
-
-\section{Heterogeneus Layers}
+At first we combined an CNN with a LSTM thinking to use the CNN as feature extractor for the LSTM.
+This was giving us the same results of BiLstm + Norm + Augm.
 \subsection{LSTM + CNN}
-\subsection{CNN + LSTM}
+We also tried using LSTM to analyze the time series and then CNN as feature extractor for the analyzed data
+but the result was the same of BiLstm also in this case.
 
-\subsection{CNN + DENSE}
-\subsection{ALTRI DI RAFFAELLO}
-
-\section{Our best Model}
-Unexpectedly bla bla bla
-
-\section{Conclusion}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=6cm, height=4cm]{LSTMCNN}
-\caption{LSTM-CNN and CNN-LSTM model schematics}
-\end{figure}
-
-\section{Adapt 2D models to 1D convolutions}
+\section{Inspired By Existing Models}
 \subsection{InceptionNet}
 \begin{figure}[h]
 \centering
-\includegraphics[width=6cm, height=4cm]{Inception}
+\includegraphics[width=8cm, height=4cm]{Inception}
 \caption{CNN1D Inception Like Net}
 \end{figure}
 
 \subsection{Resnet}
+\subsubsection{Resnet-CNN1D}
+Resnet Model works by adding a big number of layer blocks alternated by some skip layers to avoid vanishing gradient descent.\
+We replicated this model in keras using Conv1D instead of the original Conv2D but unfortunatly it has not improved performances and we were still stucked to 68\%.
+\subsubsection{Resnet-LSTM}
+A second step we had done was to replace the CNN1D with some LSTM like in figure3,
+This improved the performances by 0.9\% respect to our best model so far, bringing the accuracy on codalab to 68.9\%.
 \begin{figure}[h]
 \centering
 \includegraphics[width=4cm, height=8cm,angle =90]{resnet}
 \caption{Resnet Like LSTM Net}
 \end{figure}
 
+\section{Heterogeneus Layers}
+Not seeing results by contatenating network we thought to create a network of Hybrid layers of LSTM and CNN
+\subsection{LSTM + CNN}
+By inspiration on the last laboratories on Time Series forecasting, we tried to create multiple layer of LSTM + CNN
+obtaining an improvement in performances from 68\% to 69\% in respect to the vanilla BiLstm.
+\subsection{CNN + LSTM}
+We also tried to do the opposite obtaining slightly better results (70\% on submission).
+\subsection{CNN + DENSE}
+\subsection{ALTRI DI RAFFAELLO}
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=6cm, height=5cm]{LSTMCNN}
+  \caption{LSTM-CNN and CNN-LSTM model schematics}
+\end{figure}
+
+\section{Our best Model}
+Unexpectedly bla bla bla
+
+
+
+
+
+\section{Conclusion}
 
 \bibliographystyle{sdss2020} % Please do not change the bibliography style
 \bibliography{SampleReferencesForExtendedAbstract}
