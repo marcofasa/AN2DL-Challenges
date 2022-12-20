@@ -71,12 +71,37 @@ footnotes & 9 pt & \\
 %All our tries
 
 \section{Preprocessing}
+When it comes to TimeSeries classificaion/forecasting, preprocessing is a crucial step to grant optimal results.\
+In this section will be described all the preprocessing techniques we tried or discarded.
 \subsection{Normalization}
-
+After visualizing the data, we noticed that samples has different scale factor based on targets.\
+To avoid advantaging some of the classes we decided to normalize the dataset.
+\subsubsection{Per Column}
+As first approach, we normalized the dataset by \textbf{FULL columns}
+\begin{itemize}
+  \item \textbf{MinMax} Does not work properly; When applied, the validation accuracy dropped to 33%.
+  \item \textbf{Mean / Std} This technique does not improve the accuracy on vanilla models.
+\end{itemize}
+\subsubsection{Per Sample}
+The next method we tried, was to normalize each sample (TimeSerie) independently, to completly remove the different scales of the targets.
+\begin{itemize}
+  \item \textbf{MinMax} Improve performances but not enough, at least on vanilla models
+  \item \textbf{Mean / Std} This was the \textbf{Game Changer} for us, it improves the performances on Vanilla models from 63\% to 67\%
+\end{itemize}
 \subsection{Augmentation}
-\subsection{Numpy}
-NICOLA
-\subsection{TSUNG/Librery}
+In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
+We tried both "by hand" and Library approach with the following results.
+\subsubsection{Numpy}
+Using the function \textit{np.random.normal} it is possible to generate random noise with a certain mean std and shape.\
+To obtain augmented samples we copied the dataset multiple time, and then, for each time serie, we calculated it's standard deviation and applied the augmentation like follow:
+
+\begin{figure}[h]
+  \[ x = x + np.random.normal(0,std,x.shape) * w\]
+  \caption{With x be a single time series, w be a weight of our choice}
+\end{figure}
+
+The result of augmantation was immediate and bring us a solid 68\% using the vanilla BiLstm
+\subsubsection{TSUNG/Librery}
 %Per raffaello, cambia il nome del titoletto come vuoi
  RAFFAELLO
 \subsection{Seasonal + Trend preprocess}
