@@ -40,12 +40,8 @@ Homework 2}
 
 
 \section{Introduction}
-In this homework our approach has been to predict the target variables at a future time point based on the learning from previous time points.\\
-To keep the problem tractable, learning methods used  use data from a fixed length window in the past as an explicit input.\
-the range of possible solutions was limited compared to the previous task, in this case the tests done included RNN, Resnet, LSTM and 1D CNN models.\\
-In order to ease the development of our best solution, we thought it would have been useful to create an ad-hoc helper.\\
-As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy).
-In particular it has been useful to build sequences and data augmentation (dealing with randomness and noise).
+In this homework, we had to deal with time series. A time series is a sequence of data points that occur in successive order over some period of time. We are given a dataset composed of 2429 sequences each composed of 36 records described by 6 features. In particular, each sequence belongs to a class. Our goal is to build a neural network able to properly classify these data series.\\[0.1cm]
+To keep the problem tractable, the chosen learning methods use data from a fixed-length window in the past as an explicit input. The range of possible solutions was limited compared to the previous task; in this case the tests done included Recurrent Neural Networks, ResNet, LSTM, and 1D-CNN models.
 \section{Vanilla Models}
 We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
 The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers:
@@ -76,25 +72,42 @@ In the Homework1 challenge, we noticed the importance of augmentation on this fi
 We tried both "by hand" and Library approach with the following results.
 \subsubsection{Numpy}
 Using the function \textit{np.random.normal} it is possible to generate random noise with a certain mean std and shape.\
-To obtain augmented samples we copied the dataset multiple time, and then, for each time serie, we calculated it's standard deviation and applied the augmentation like follow:
+To obtain augmented samples we copied the dataset multiple time, and then, for each time series, we calculated its standard deviation and applied the augmentation as follow:
+\begin{equation*}
+    x' = x + w\cdot\mathcal{N}(0, \sigma)
+\end{equation*}
+where $x$ is a single time series, $x'$ the new (augmented) series, $\sigma$ the standard deviation of $x$ and $w$ an arbitrary weight.
 
-\begin{figure}[h]
-  \[ x = x + np.random.normal(0,std,x.shape) * w\]
-  \caption{With x be a single time series, w be a weight of our choice}
-\end{figure}
-
-The result of augmentation was immediate and bring us a solid 68\% using the vanilla BiLstm (that was performing only 67\% without augmentation)
+The result of augmentation was immediate and bring us a solid 0.68 using the vanilla BiLstm (that was performing only 0.67 without augmentation)
 \subsubsection{TSUNG/Librery}
 %Per raffaello, cambia il nome del titoletto come vuoi
  RAFFAELLO
-\subsection{Seasonal + Trend preprocess}
-Christian
+\subsection{Noise Cleaning}
+A promising preprocessing technique we guessed was interesting to apply was to get rid of noise, namely, extract just the trend and the seasonal behavior of the time series. Indeed, overall, a time series $x$ can be seen as the sum of three components
+\begin{equation*}
+    x = trend + seasonal + noise
+\end{equation*}
+Our goal was to obtain a new data series, $x'$, such that
+\begin{equation*}
+    x' = trend + seasonal
+\end{equation*}
+In order to do that, we exploited the \textbf{seasonal\_decompose} function from the \textbf{statsmodels} module. We tried it in different configurations, that is, we tried to place it in different points of the pipeline:
+\begin{itemize}
+    \item Normalization $\rightarrow$ Augmentation $\rightarrow$ Decomposition
+    \item Normalization $\rightarrow$ Decomposition $\rightarrow$ Augmentation
+    \item Decomposition $\rightarrow$ Augmentation $\rightarrow$ Normalization
+    \item etc...
+\end{itemize}
+Regardless of the order used, unfortunately, this technique did not give us great results. As a matter of fact, it did not improve the accuracy. Nevertheless, the best configuration was to apply augmentation first and decomposition at the end. The worst configuration, meanwhile, turned out to be the reverse of the just mentioned, that is, decomposition first and augmentation at the end.
 \subsection{Expanding Window size}
 \subsection{Adding New Features}
-Christian
-
+In order to further improve the accuracy, we tried to expand the number of features. In particular, what we did was to create new 8 features in which two of them were just the mean and the median of each row, while the remaining ones were computed as follows: for each feature in the original dataset, we generate a new feature just by adding some noise. In other terms, by calling as $x_f$ the time series described by feature $f$, the new time series (feature), $x_f'$, is equal to
+\begin{equation*}
+    x_f' = x_f + \mathcal{N}(0, \sigma)
+\end{equation*}
+where $\sigma$ is the standard deviation of $x_f$. Incredibly, this allows us to get up to 0.8250 of accuracy on the test set. However, in Codalab, the performance dropped down dramatically to 0.54. We think that this expansion tries to replicate too much of the dataset we are given and it created some sort of overfitting leading to a poorly generalized model.
 \section{Net Concatenations}
-Now that our Preprocessing was giving promising results and the possible changes to vanilla models was not giving results better than 68.0\%
+Now that our Preprocessing was giving promising results and the possible changes to vanilla models was not giving results better than 0.68
 we decided to try combining LSTM and CNN into a single network.
 \subsection{CNN + LSTM}
 At first we combined an CNN with a LSTM thinking to use the CNN as feature extractor for the LSTM.
