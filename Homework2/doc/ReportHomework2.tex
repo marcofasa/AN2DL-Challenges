@@ -40,19 +40,15 @@ Homework 2}
 
 
 \section{Introduction}
-
-
-CHRISTIAN + MARCO
-TIME SERIES MARCO
-
-%What are time series??
-%How to deal with them in short
-
-
-%All our tries
+In this homework our approach has been to predict the target variables at a future time point based on the learning from previous time points.\\
+To keep the problem tractable, learning methods used  use data from a fixed length window in the past as an explicit input.\
+the range of possible solutions was limited compared to the previous task, in this case the tests done included RNN, Resnet, LSTM and 1D CNN models.\\
+In order to ease the development of our best solution, we thought it would have been useful to create an ad-hoc helper.\\
+As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy).
+In particular it has been useful to build sequences and data augmentation (dealing with randomness and noise).
 
 \section{Preprocessing}
-When it comes to TimeSeries classificaion/forecasting, preprocessing is a crucial step to grant optimal results.\
+When it comes to TimeSeries classification/forecasting, preprocessing is a crucial step to grant optimal results.\
 In this section will be described all the preprocessing techniques we tried or discarded.
 \subsection{Normalization}
 After visualizing the data, we noticed that samples has different scale factor based on targets.\
@@ -64,7 +60,7 @@ As first approach, we normalized the dataset by \textbf{FULL columns}
   \item \textbf{Mean / Std} This technique does not improve the accuracy on vanilla models.
 \end{itemize}
 \subsubsection{Per Sample}
-The next method we tried, was to normalize each sample (TimeSerie) independently, to completly remove the different scales of the targets.
+The next method we tried, was to normalize each sample (TimeSeries) independently, to completly remove the different scales of the targets.
 \begin{itemize}
   \item \textbf{MinMax} Improve performances but not enough, at least on vanilla models
   \item \textbf{Mean / Std} This was the \textbf{Game Changer} for us, it improves the performances on Vanilla models from 63\% to 67\% on the Vanilla BiLstm
@@ -81,7 +77,7 @@ To obtain augmented samples we copied the dataset multiple time, and then, for e
   \caption{With x be a single time series, w be a weight of our choice}
 \end{figure}
 
-The result of augmantation was immediate and bring us a solid 68\% using the vanilla BiLstm (that was performing only 67\% without augmentation)
+The result of augmentation was immediate and bring us a solid 68\% using the vanilla BiLstm (that was performing only 67\% without augmentation)
 \subsubsection{TSUNG/Librery}
 %Per raffaello, cambia il nome del titoletto come vuoi
  RAFFAELLO
@@ -91,7 +87,11 @@ Christian
 \subsection{Adding New Features}
 Christian
 \section{Vanilla Models}
-MARCO
+We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
+The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers:
+
+This model unfortunately arrived at a result of maximum 0.70 in terms of local Accuracy, reached with a grid search on filters,kernels and dropout.\\
+We then moved to a Vanilla LSTM and Bidirectional-LSTM, but with poor results.
 \section{Net Concatenations}
 Now that our Preprocessing was giving promising results and the possible changes to vanilla models was not giving results better than 68.0\%
 we decided to try combining LSTM and CNN into a single network.
@@ -126,6 +126,8 @@ This improved the performances by 0.9\% respect to our best model so far, bringi
 \section{Heterogeneus Layers}
 Not seeing results by contatenating network we thought to create a network of Hybrid layers of LSTM and CNN
 \subsection{LSTM + CNN Blocks}
+Not seeing results by concatenating network we thought to create a network of Hybrid layers of LSTM and CNN
+\subsection{LSTM + CNN}
 By inspiration on the last laboratories on Time Series forecasting, we tried to create multiple layer of LSTM + CNN
 obtaining an improvement in performances from 68\% to 69\% in respect to the vanilla BiLstm.
 \subsection{CNN + LSTM Blocks}
