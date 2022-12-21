@@ -153,7 +153,27 @@ We also tried to do the opposite obtaining slightly better results (70\% on subm
 \end{figure}
 
 \subsection{CNN + DENSE Blocks}
+In an effort to capture more complex relationships between features, we experimented with adding dense layers between an LSTM and CNN network.
+Dense layers, also known as fully-connected layers, are a type of neural network layer that allows every neuron in the layer to receive input from all neurons in the previous layer and produce an output for all neurons in the next layer.
+This allows dense layers to learn complex relationships between features, which can be especially useful when combined with LSTM and CNN layers which are effective at processing sequential and spatial data, respectively.
+
+However, further attempts to improve performance by modifying the network were made, such as changing the filter size or the number of LSTM units, or adding and removing batch normalization and activation layers, did not result in any additional improvements.
+This could be due to the network being unable to learn additional useful patterns from the data, or it could be because the added complexity of the dense layers did not justify the incremental increase in accuracy.
+It is important to carefully consider the trade-off between complexity and accuracy when designing a neural network.
+
+
 \subsection{ALTRI DI RAFFAELLO}
+In an effort to improve the performance of our classification model, we also tried implementing a 1 vs All approach where we trained one separate model for each class.
+Unfortunately, this approach did not work as well as we had hoped, with the network unable to recognize any sequences and classifying them all as "other."
+We tried adjusting the ratio of class to other instances in the dataset, as well as building models on top of a pretrained model, but neither of these attempts resulted in significant improvements.
+
+One possible explanation for the poor performance of the 1 vs All approach is that it can be challenging for a neural network to learn to distinguish
+classes with very similar features.
+Additionally, the network may have struggled to learn useful patterns from the data due to an imbalanced feature distribution or a small dataset size.
+
+After observing that the network was performing poorly on some classes and well on others, we attempted to split the dataset by performance classes in the hope of improving overall score.
+The idea is to avoid that the network is biased towards the classes that it performs well on, and instead train it on classes that it struggles to classify.
+However, this approach also led to weak results, which could have been due to a lack of data available (and maybe the lack of unique features of some classes) for training.
 
 \section{Our best Model}
 Unexpectedly bla bla bla
