@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{setspace}
-\setstretch{0.9}
+\setstretch{1}
 \graphicspath{{images/}}
 
 \title{Artificial Neural Networks and Deep Learning \\
@@ -46,6 +46,12 @@ the range of possible solutions was limited compared to the previous task, in th
 In order to ease the development of our best solution, we thought it would have been useful to create an ad-hoc helper.\\
 As a matter of fact, a lot of code is often repeated or many lines of code are needed just to plot or to get insightful results (such as the confusion matrix or the accuracy).
 In particular it has been useful to build sequences and data augmentation (dealing with randomness and noise).
+\section{Vanilla Models}
+We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
+The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers:
+
+This model unfortunately arrived at a result of maximum 0.70 in terms of local Accuracy, reached with a grid search on filters,kernels and dropout.\\
+We then moved to a Vanilla LSTM and Bidirectional-LSTM, but with poor results.
 
 \section{Preprocessing}
 When it comes to TimeSeries classification/forecasting, preprocessing is a crucial step to grant optimal results.\
@@ -86,12 +92,7 @@ Christian
 \subsection{Expanding Window size}
 \subsection{Adding New Features}
 Christian
-\section{Vanilla Models}
-We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
-The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers:
 
-This model unfortunately arrived at a result of maximum 0.70 in terms of local Accuracy, reached with a grid search on filters,kernels and dropout.\\
-We then moved to a Vanilla LSTM and Bidirectional-LSTM, but with poor results.
 \section{Net Concatenations}
 Now that our Preprocessing was giving promising results and the possible changes to vanilla models was not giving results better than 68.0\%
 we decided to try combining LSTM and CNN into a single network.
@@ -149,6 +150,12 @@ Unexpectedly bla bla bla
 
 
 \section{Conclusion}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=8cm, height=6cm]{chart}
+  \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
+\end{figure}
 
 \bibliographystyle{sdss2020} % Please do not change the bibliography style
 \bibliography{SampleReferencesForExtendedAbstract}
