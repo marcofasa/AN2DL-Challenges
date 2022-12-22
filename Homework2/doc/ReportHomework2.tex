@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{setspace}
-\setstretch{1}
+\setstretch{0.9}
 \graphicspath{{images/}}
 
 \title{Artificial Neural Networks and Deep Learning \\
@@ -111,6 +111,8 @@ In order to do that, we exploited the \textbf{seasonal\_decompose} function from
 \end{itemize}
 Regardless of the order used, unfortunately, this technique did not give us great results. As a matter of fact, it did not improve the accuracy. Nevertheless, the best configuration was to apply augmentation first and decomposition at the end. The worst configuration, meanwhile, turned out to be the reverse of the just mentioned, that is, decomposition first and augmentation at the end.
 \subsection{Expanding Window size}
+Another evolution of our preprocessing pipeline was to try combining multiple series of same target (eg: sequences of 2 series concatenated).\
+The performance was good but  but since we did not know what data realy are and what was their real meaning we discarded this option almost immediatly.
 \subsection{Adding New Features}
 In order to further improve the accuracy, we tried to expand the number of features. In particular, what we did was to create new 8 features in which two of them were just the mean and the median of each row, while the remaining ones were computed as follows: for each feature in the original dataset, we generate a new feature just by adding some noise. In other terms, by calling as $x_f$ the time series described by feature $f$, the new time series (feature), $x_f'$, is equal to
 \begin{equation*}
@@ -128,14 +130,12 @@ We also tried using LSTM to analyze the time series and then CNN as feature extr
 but the result was the same of BiLstm also in this case.
 
 \section{Inspired By Existing Models}
-\subsection{InceptionNet}
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm, height=4cm]{Inception}
 \caption{CNN1D Inception Like Net}
 \end{figure}
 
-\subsection{Resnet}
 \subsubsection{Resnet-CNN1D}
 Resnet Model works by adding a big number of layer blocks alternated by some skip layers to avoid vanishing gradient descent.\
 We replicated this model in keras using Conv1D instead of the original Conv2D but unfortunatly it has not improved performances and we were still stucked to 68\%.
@@ -151,8 +151,6 @@ This improved the performances by 0.9\% respect to our best model so far, bringi
 \section{Heterogeneus Layers}
 Not seeing results by contatenating network we thought to create a network of Hybrid layers of LSTM and CNN
 \subsection{LSTM + CNN Blocks}
-Not seeing results by concatenating network we thought to create a network of Hybrid layers of LSTM and CNN
-\subsection{LSTM + CNN}
 By inspiration on the last laboratories on Time Series forecasting, we tried to create multiple layer of LSTM + CNN
 obtaining an improvement in performances from 68\% to 69\% in respect to the vanilla BiLstm.
 \subsection{CNN + LSTM Blocks}
@@ -173,7 +171,7 @@ This could be due to the network being unable to learn additional useful pattern
 It is important to carefully consider the trade-off between complexity and accuracy when designing a neural network.
 
 
-\subsection{ALTRI DI RAFFAELLO}
+\section{Other Models}
 In an effort to improve the performance of our classification model, we also tried implementing a 1 vs All approach where we trained one separate model for each class.
 Unfortunately, this approach did not work as well as we had hoped, with the network unable to recognize any sequences and classifying them all as "other."
 We tried adjusting the ratio of class to other instances in the dataset, as well as building models on top of a pretrained model, but neither of these attempts resulted in significant improvements.
