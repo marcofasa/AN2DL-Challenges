@@ -107,7 +107,6 @@ In order to do that, we exploited the \textbf{seasonal\_decompose} function from
     \item Normalization $\rightarrow$ Augmentation $\rightarrow$ Decomposition
     \item Normalization $\rightarrow$ Decomposition $\rightarrow$ Augmentation
     \item Decomposition $\rightarrow$ Augmentation $\rightarrow$ Normalization
-    \item etc...
 \end{itemize}
 Regardless of the order used, unfortunately, this technique did not give us great results. As a matter of fact, it did not improve the accuracy. Nevertheless, the best configuration was to apply augmentation first and decomposition at the end. The worst configuration, meanwhile, turned out to be the reverse of the just mentioned, that is, decomposition first and augmentation at the end.
 \subsection{Expanding Window size}
@@ -155,11 +154,12 @@ By inspiration on the last laboratories on Time Series forecasting, we tried to 
 obtaining an improvement in performances from 68\% to 69\% in respect to the vanilla BiLstm.
 \subsection{CNN + LSTM Blocks}
 We also tried to do the opposite obtaining slightly better results (70\% on submission).
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=6cm, height=5cm]{LSTMCNN}
-  \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
-\end{figure}
+%begin{figure}[h]
+ % \centering
+ % \includegraphics[width=6cm, height=5cm]{LSTMCNN}
+%  \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
+%\end{figure}
+
 
 \subsection{CNN + DENSE Blocks}
 In an effort to capture more complex relationships between features, we experimented with adding dense layers between an LSTM and CNN network.
@@ -184,7 +184,7 @@ Our best model was a basic CNN with only 2 layers and no globalAveragePooling.
 This result was surprising because we build a lot of other more complex models that we thought would have been more robust but instead were overcomed by a realy simple network.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=8cm, height=6cm]{chart}
+  \includegraphics[width=6cm, height=5cm]{chart}
   \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
 \end{figure}
 
