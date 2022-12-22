@@ -69,7 +69,19 @@ The next method we tried, was to normalize each sample (TimeSeries) independentl
 \end{itemize}
 \subsection{Augmentation}
 In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
-We tried both "by hand" and Library approach with the following results.
+Due to lack of libraries for augmentation of data sequences, we decided to implement our own augmentation techniques.
+
+In addition to adding noise, we also experimented with various data augmentation techniques including jitter, magnitude warp, time warp, and window slice.
+While these techniques led to significant improvements with weaker models, they only resulted in small improvements for more efficient models.
+This is likely because more powerful models are already able to effectively extract all the necessary features from the data, so additional augmentation has less impact.
+We also tried other methods such as rotation and permutation, but these resulted in a worse overall score.
+
+As part of our experimentation, we tried using autoencoders to denoise the data and generate new samples.
+Unfortunately, the results were disappointing.
+This was not a surprise, as the effectiveness of an autoencoder is closely tied to the quality of the network used for classification.
+In this case, the classification network was not performing well, so it was expected that using it in an autoencoder would also produce suboptimal results.
+Despite this, we believe that autoencoders have the potential to be a valuable tool in data preprocessing and will continue to explore their use in future work.
+
 \subsubsection{Numpy}
 Using the function \textit{np.random.normal} it is possible to generate random noise with a certain mean std and shape.\
 To obtain augmented samples we copied the dataset multiple time, and then, for each time series, we calculated its standard deviation and applied the augmentation as follow:
