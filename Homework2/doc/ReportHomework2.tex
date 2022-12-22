@@ -69,7 +69,7 @@ The next method we tried, was to normalize each sample (TimeSeries) independentl
 \end{itemize}
 \subsection{Augmentation}
 In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
-We tried both "by hand" and Library approach with the following results.
+Due to lack of libraries for augmentation of data sequences, we decided to implement our own augmentation techniques.
 
 In addition to adding noise, we also experimented with various data augmentation techniques including jitter, magnitude warp, time warp, and window slice.
 While these techniques led to significant improvements with weaker models, they only resulted in small improvements for more efficient models.
