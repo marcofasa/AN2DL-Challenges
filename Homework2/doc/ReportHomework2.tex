@@ -132,7 +132,7 @@ but the result was the same of BiLstm also in this case.
 \section{Inspired By Existing Models}
 \begin{figure}[h]
 \centering
-\includegraphics[width=8cm, height=4cm]{Inception}
+\includegraphics[width=6cm, height=3cm]{Inception}
 \caption{CNN1D Inception Like Net}
 \end{figure}
 
@@ -144,7 +144,7 @@ A second step we had done was to replace the CNN1D with some LSTM like in figure
 This improved the performances by 0.9\% respect to our best model so far, bringing the accuracy on codalab to 68.9\%.
 \begin{figure}[h]
 \centering
-\includegraphics[width=4cm, height=8cm,angle =90]{resnet}
+\includegraphics[width=3cm, height=7cm,angle =90]{resnet}
 \caption{Resnet Like LSTM Net}
 \end{figure}
 
@@ -179,15 +179,9 @@ One possible explanation for the poor performance is that the network struggled 
 We also tried splitting the dataset by performance classes in an effort to improve the overall score, but this approach also led to weak results possibly due to a lack of data or unique features for some classes.
 
 
-\section{Our best Model}
-Unexpectedly bla bla bla
-
-
-
-
-
 \section{Conclusion}
-
+Our best model was a basic CNN with only 2 layers and no globalAveragePooling.
+This result was surprising because we build a lot of other more complex models that we thought would have been more robust but instead were overcomed by a realy simple network.
 \begin{figure}[h]
   \centering
   \includegraphics[width=8cm, height=6cm]{chart}
