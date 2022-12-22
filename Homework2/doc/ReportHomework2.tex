@@ -71,7 +71,18 @@ The next method we tried, was to normalize each sample (TimeSeries) independentl
 In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
 Due to lack of libraries for augmentation of data sequences, we decided to implement our own augmentation techniques.
 
-In addition to adding noise, we also experimented with various data augmentation techniques including jitter, magnitude warp, time warp, and window slice.
+\subsubsection{Numpy}
+Using the function \textit{np.random.normal} it is possible to generate random noise with a certain mean std and shape.\
+To obtain augmented samples we copied the dataset multiple time, and then, for each time series, we calculated its standard deviation and applied the augmentation as follow:
+\begin{equation*}
+    x' = x + w\cdot\mathcal{N}(0, \sigma)
+\end{equation*}
+where $x$ is a single time series, $x'$ the new (augmented) series, $\sigma$ the standard deviation of $x$ and $w$ an arbitrary weight.
+
+The result of augmentation was immediate and bring us a solid 0.68 using the vanilla BiLstm (that was performing only 0.67 without augmentation)
+
+\subsubsection{More involved augmentation}
+In addition to adding noise, we also experimented with various data augmentation techniques including, magnitude warp, time warp, and window slice.
 While these techniques led to significant improvements with weaker models, they only resulted in small improvements for more efficient models.
 This is likely because more powerful models are already able to effectively extract all the necessary features from the data, so additional augmentation has less impact.
 We also tried other methods such as rotation and permutation, but these resulted in a worse overall score.
@@ -82,18 +93,6 @@ This was not a surprise, as the effectiveness of an autoencoder is closely tied 
 In this case, the classification network was not performing well, so it was expected that using it in an autoencoder would also produce suboptimal results.
 Despite this, we believe that autoencoders have the potential to be a valuable tool in data preprocessing and will continue to explore their use in future work.
 
-\subsubsection{Numpy}
-Using the function \textit{np.random.normal} it is possible to generate random noise with a certain mean std and shape.\
-To obtain augmented samples we copied the dataset multiple time, and then, for each time series, we calculated its standard deviation and applied the augmentation as follow:
-\begin{equation*}
-    x' = x + w\cdot\mathcal{N}(0, \sigma)
-\end{equation*}
-where $x$ is a single time series, $x'$ the new (augmented) series, $\sigma$ the standard deviation of $x$ and $w$ an arbitrary weight.
-
-The result of augmentation was immediate and bring us a solid 0.68 using the vanilla BiLstm (that was performing only 0.67 without augmentation)
-\subsubsection{TSUNG/Librery}
-%Per raffaello, cambia il nome del titoletto come vuoi
- RAFFAELLO
 \subsection{Noise Cleaning}
 A promising preprocessing technique we guessed was interesting to apply was to get rid of noise, namely, extract just the trend and the seasonal behavior of the time series. Indeed, overall, a time series $x$ can be seen as the sum of three components
 \begin{equation*}
