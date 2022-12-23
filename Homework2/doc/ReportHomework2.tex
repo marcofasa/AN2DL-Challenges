@@ -40,35 +40,35 @@ Homework 2}
 
 
 \section{Introduction}
-In this homework, we had to deal with time series. A time series is a sequence of data points that occur in successive order over some period of time. We are given a dataset composed of 2429 sequences each composed of 36 records described by 6 features. In particular, each sequence belongs to a class. Our goal is to build a neural network able to properly classify these data series.\\[0.1cm]
-To keep the problem tractable, the chosen learning methods use data from a fixed-length window in the past as an explicit input. The range of possible solutions was limited compared to the previous task; in this case the tests done included Recurrent Neural Networks, ResNet, LSTM, and 1D-CNN models.
+In this homework, we had to deal with time series. A time series is a sequence of data points that occur in successive order over some period of time.\\
+We were provided with a dataset consisting of 2429 sequences each composed of 36 records described by 6 features.\\
+In particular, each sequence belongs to a class. Our goal is to build a neural network able to properly classify these data series.\\[0.1cm]
+To keep the problem tractable, the chosen learning methods use data from a fixed-length window in the past as an explicit input. The range of possible solutions was limited, compared to the previous task; in this case the tests done included Recurrent Neural Networks, ResNet, LSTM, and 1D-CNN models.
 \section{Vanilla Models}
-We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
-The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers:
 
-This model unfortunately arrived at a result of maximum 0.70 in terms of local Accuracy, reached with a grid search on filters,kernels and dropout.\\
-We then moved to a Vanilla LSTM and Bidirectional-LSTM, but with poor results.
+We first approached a Vanilla model in order to understand if we could easily tackle the classification problem with a 1D Convolutional Neuronal Network.\\
+The best configuration we found consisted in 3 convolutions followed by a Dropout and 2 Dense layers.\\
+This model unfortunately arrived at a result of maximum 0.70 in terms of local Accuracy, reached with a grid search on filters,kernels and dropout. We then moved to a Vanilla LSTM and Bidirectional-LSTM, but with poor results.
 
 \section{Preprocessing}
 When it comes to TimeSeries classification/forecasting, preprocessing is a crucial step to grant optimal results.\
 In this section will be described all the preprocessing techniques we tried or discarded.
 \subsection{Normalization}
-After visualizing the data, we noticed that samples has different scale factor based on targets.\
-To avoid advantaging some of the classes we decided to normalize the dataset.
+After visualizing the data, we noticed that samples has different scale factor based on targets: to avoid advantaging some of the classes we decided to normalize the dataset.
 \subsubsection{Per Column}
-As first approach, we normalized the dataset by \textbf{FULL columns}
+As first approach, we normalized the dataset by \textbf{FULL columns}:
 \begin{itemize}
   \item \textbf{MinMax} Does not work properly; When applied, the validation accuracy dropped to 33%.
   \item \textbf{Mean / Std} This technique does not improve the accuracy on vanilla models.
 \end{itemize}
 \subsubsection{Per Sample}
-The next method we tried, was to normalize each sample (TimeSeries) independently, to completly remove the different scales of the targets.
+The next method we tried, was to normalize each sample (TimeSeries) independently, to completely remove the different scales of the targets:
 \begin{itemize}
   \item \textbf{MinMax} Improve performances but not enough, at least on vanilla models
   \item \textbf{Mean / Std} This was the \textbf{Game Changer} for us, it improves the performances on Vanilla models from 63\% to 67\% on the Vanilla BiLstm
 \end{itemize}
 \subsection{Augmentation}
-In the Homework1 challenge, we noticed the importance of augmentation on this field and so we decided to give it a try also on time series.\
+In the Homework1 challenge, we noticed the importance of augmentation on this field and so, we decided to give it a try also on time series.\
 Due to lack of libraries for augmentation of data sequences, we decided to implement our own augmentation techniques.
 
 \subsubsection{Numpy}
@@ -77,24 +77,22 @@ To obtain augmented samples we copied the dataset multiple time, and then, for e
 \begin{equation*}
     x' = x + w\cdot\mathcal{N}(0, \sigma)
 \end{equation*}
-where $x$ is a single time series, $x'$ the new (augmented) series, $\sigma$ the standard deviation of $x$ and $w$ an arbitrary weight.
-
-The result of augmentation was immediate and bring us a solid 0.68 using the vanilla BiLstm (that was performing only 0.67 without augmentation)
+where $x$ is a single time series, $x'$ the new (augmented) series, $\sigma$ the standard deviation of $x$ and $w$ an arbitrary weight.\\
+The result of augmentation was immediate and bring us a solid 0.68 using the vanilla BiLSTM (that was performing only 0.67 without augmentation).
 
 \subsubsection{More involved augmentation}
-In addition to adding noise, we also experimented with various data augmentation techniques including, magnitude warp, time warp, and window slice.
-While these techniques led to significant improvements with weaker models, they only resulted in small improvements for more efficient models.
+In addition to adding noise, we also experimented with various data augmentation techniques including: magnitude warp, time warp, and window slice.
+While these techniques led to significant improvements with weaker models, they only resulted in small improvements for more efficient models.\\
 This is likely because more powerful models are already able to effectively extract all the necessary features from the data, so additional augmentation has less impact.
-We also tried other methods such as rotation and permutation, but these resulted in a worse overall score.
-
-As part of our experimentation, we tried using autoencoders to denoise the data and generate new samples.
-Unfortunately, the results were disappointing.
+We also tried other methods such as rotation and permutation, but these resulted in a worse overall score.\\
+As part of our experimentation, we tried using autoencoders to denoise the data and generate new samples. Unfortunately, the results were disappointing.\\
 This was not a surprise, as the effectiveness of an autoencoder is closely tied to the quality of the network used for classification.
 In this case, the classification network was not performing well, so it was expected that using it in an autoencoder would also produce suboptimal results.
-Despite this, we believe that autoencoders have the potential to be a valuable tool in data preprocessing and will continue to explore their use in future work.
+Despite this, we believed that autoencoders had the potential to be a valuable tool in data preprocessing and we will continue to explore their use in future work.
 
 \subsection{Noise Cleaning}
-A promising preprocessing technique we guessed was interesting to apply was to get rid of noise, namely, extract just the trend and the seasonal behavior of the time series. Indeed, overall, a time series $x$ can be seen as the sum of three components
+A promising preprocessing technique we thought was interesting to apply, was to get rid of noise. Namely, to extract just the trend and the seasonal behavior of the time series. \\
+Indeed, overall, a time series $x$ can be seen as the sum of three components:
 \begin{equation*}
     x = trend + seasonal + noise
 \end{equation*}
@@ -113,7 +111,7 @@ Regardless of the order used, unfortunately, this technique did not give us grea
 Another evolution of our preprocessing pipeline was to try combining multiple series of same target (eg: sequences of 2 series concatenated).\
 The performance was good but  but since we did not know what data realy are and what was their real meaning we discarded this option almost immediatly.
 \subsection{Adding New Features}
-In order to further improve the accuracy, we tried to expand the number of features. In particular, what we did was to create new 8 features in which two of them were just the mean and the median of each row, while the remaining ones were computed as follows: for each feature in the original dataset, we generate a new feature just by adding some noise. In other terms, by calling as $x_f$ the time series described by feature $f$, the new time series (feature), $x_f'$, is equal to
+In order to further improve the accuracy, we tried to expand the number of features. In particular, what we did was to create 8 new features in which two of them were just the mean and the median of each row, while the remaining ones were computed as follows: for each feature in the original dataset, we generate a new feature just by adding some noise. In other terms, by calling as $x_f$ the time series described by feature $f$, the new time series (feature), $x_f'$, is equal to
 \begin{equation*}
     x_f' = x_f + \mathcal{N}(0, \sigma)
 \end{equation*}
@@ -156,16 +154,15 @@ obtaining an improvement in performances from 68\% to 69\% in respect to the van
 We also tried to do the opposite obtaining slightly better results (70\% on submission).
 %begin{figure}[h]
  % \centering
- % \includegraphics[width=6cm, height=5cm]{LSTMCNN}
+ % \includegraphics[width=3cm, height=2cm]{LSTMCNN}
 %  \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
 %\end{figure}
 
 
 \subsection{CNN + DENSE Blocks}
 In an effort to capture more complex relationships between features, we experimented with adding dense layers between an LSTM and CNN network.
-Dense layers, also known as fully-connected layers, are a type of neural network layer that allows every neuron in the layer to receive input from all neurons in the previous layer and produce an output for all neurons in the next layer.
-This allows dense layers to learn complex relationships between features, which can be especially useful when combined with LSTM and CNN layers which are effective at processing sequential and spatial data, respectively.
-
+Dense layers, also known as fully-connected layers, are a type of neural network layer that allows every neuron in the layer to receive input from all neurons in the previous layer and produce an output for all neurons in the next layer.\\
+This allows dense layers to learn complex relationships between features, which can be especially useful when combined with LSTM and CNN layers that are effective at processing sequential and spatial data, respectively.\\
 However, further attempts to improve performance by modifying the network were made, such as changing the filter size or the number of LSTM units, or adding and removing batch normalization and activation layers, did not result in any additional improvements.
 This could be due to the network being unable to learn additional useful patterns from the data, or it could be because the added complexity of the dense layers did not justify the incremental increase in accuracy.
 It is important to carefully consider the trade-off between complexity and accuracy when designing a neural network.
@@ -173,9 +170,9 @@ It is important to carefully consider the trade-off between complexity and accur
 
 \section{Other Models}
 We attempted to improve the performance of our classification model by implementing a 1 vs All approach, where we trained separate models for each class.
-However, this approach was unsuccessful and resulted in the network classifying all sequences as "other."
+However, this approach was unsuccessful and resulted in the network classifying all sequences as "other."\\
 We attempted to address this issue by adjusting the class to other instance ratio in the dataset and building models on top of a pretrained model, but neither of these attempts resulted in significant improvements.
-One possible explanation for the poor performance is that the network struggled to learn useful patterns from the data due to an imbalanced feature distribution or a small dataset size, or difficulty distinguishing between classes with similar features.
+One possible explanation for the poor performance is that the network struggled to learn useful patterns from the data due to an imbalanced feature distribution or a small dataset size, or difficulty distinguishing between classes with similar features.\\
 We also tried splitting the dataset by performance classes in an effort to improve the overall score, but this approach also led to weak results possibly due to a lack of data or unique features for some classes.
 
 
