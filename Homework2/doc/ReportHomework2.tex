@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{setspace}
-\setstretch{0.9}
+\setstretch{0.862}
 \graphicspath{{images/}}
 
 \title{Artificial Neural Networks and Deep Learning \\
@@ -55,6 +55,7 @@ When it comes to TimeSeries classification/forecasting, preprocessing is a cruci
 In this section will be described all the preprocessing techniques we tried or discarded.
 \subsection{Normalization}
 After visualizing the data, we noticed that samples has different scale factor based on targets: to avoid advantaging some of the classes we decided to normalize the dataset.
+\newline
 \subsubsection{Per Column}
 As first approach, we normalized the dataset by \textbf{FULL columns}:
 \begin{itemize}
@@ -129,7 +130,7 @@ but the result was the same of BiLstm also in this case.
 \section{Inspired By Existing Models}
 \begin{figure}[h]
 \centering
-\includegraphics[width=6cm, height=3cm]{Inception}
+\includegraphics[width=6cm, height=3.5cm]{Inception}
 \caption{CNN1D Inception Like Net}
 \end{figure}
 
@@ -181,7 +182,7 @@ Our best model was a basic CNN with only 2 layers and no globalAveragePooling.
 This result was surprising because we build a lot of other more complex models that we thought would have been more robust but instead were overcomed by a realy simple network.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=6cm, height=5cm]{chart}
+  \includegraphics[width=7cm, height=6cm]{chart}
   \caption{LSTM-CNN and CNN-LSTM Hybrid Blocks}
 \end{figure}
 
